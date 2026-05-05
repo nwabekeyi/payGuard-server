@@ -31,6 +31,15 @@ public class FinancialLedger {
 
     @Column(nullable = false)
     private BigDecimal amount;
+    @Column(name = "paystack_fee", nullable = false)
+    @Builder.Default
+    private BigDecimal paystackFee = BigDecimal.ZERO;
+    @Column(name = "platform_fee", nullable = false)
+    @Builder.Default
+    private BigDecimal platformFee = BigDecimal.ZERO;
+    @Column(name = "net_payout_amount", nullable = false)
+    @Builder.Default
+    private BigDecimal netPayoutAmount = BigDecimal.ZERO;
 
     @Column(nullable = false)
     private String currency;

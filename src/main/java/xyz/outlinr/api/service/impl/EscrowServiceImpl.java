@@ -504,10 +504,13 @@ public class EscrowServiceImpl implements EscrowService {
         String txnRef = "PO-" + escrow.getId().toString().substring(0, 8) + "-" + System.currentTimeMillis();
         ledger.setPayoutReference(txnRef);
 
+        BigDecimal payoutAmount = ledger.getNetPayoutAmount() != null && ledger.getNetPayoutAmount().compareTo(BigDecimal.ZERO) > 0
+                ? ledger.getNetPayoutAmount() : escrow.getAmount();
+
         PayoutTransaction transaction = PayoutTransaction.builder()
                 .escrow(escrow)
                 .recipient(seller)
-                .amount(escrow.getAmount())
+                .amount(payoutAmount)
                 .currency(escrow.getCurrency())
                 .bankAccountNumber(accountNumber)
                 .bankCode(bankCode)
@@ -519,7 +522,7 @@ public class EscrowServiceImpl implements EscrowService {
 
         try {
             boolean success = transferService.initiateTransfer(
-                escrow.getAmount(),
+                payoutAmount,
                 "Escrow Payout for: " + escrow.getTitle(),
                 accountNumber,
                 bankCode,

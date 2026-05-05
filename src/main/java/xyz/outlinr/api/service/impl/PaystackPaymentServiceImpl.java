@@ -25,6 +25,7 @@ import com.payguard.service.EmailService;
 import com.payguard.service.PaymentService;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.UUID;
@@ -43,6 +44,16 @@ public class PaystackPaymentServiceImpl implements PaymentService {
 
     @Value("${app.frontend.url:http://localhost:5173}")
     private String frontendUrl;
+    @Value("${app.fees.platform.percentage:1.50}")
+    private BigDecimal platformFeePercentage;
+    @Value("${app.fees.platform.fixed-ngn:0}")
+    private BigDecimal platformFixedFee;
+    @Value("${app.fees.paystack.percentage:1.50}")
+    private BigDecimal paystackFeePercentage;
+    @Value("${app.fees.paystack.fixed-ngn:100}")
+    private BigDecimal paystackFixedFee;
+    @Value("${app.fees.paystack.cap-ngn:2000}")
+    private BigDecimal paystackFeeCap;
 
     @Override
     @Transactional
@@ -167,9 +178,16 @@ public class PaystackPaymentServiceImpl implements PaymentService {
             escrowRepository.save(escrow);
 
             if (ledgerRepository.findByEscrow(escrow).isEmpty()) {
+                BigDecimal grossAmount = escrow.getAmount();
+                BigDecimal paystackFee = computePaystackFee(grossAmount);
+                BigDecimal platformFee = computePlatformFee(grossAmount);
+                BigDecimal netPayout = grossAmount.subtract(paystackFee).subtract(platformFee).max(BigDecimal.ZERO);
                 FinancialLedger ledger = FinancialLedger.builder()
                         .escrow(escrow)
-                        .amount(escrow.getAmount())
+                        .amount(grossAmount)
+                        .paystackFee(paystackFee)
+                        .platformFee(platformFee)
+                        .netPayoutAmount(netPayout)
                         .currency(escrow.getCurrency())
                         .status(LedgerStatus.HELD)
                         .paymentReference(transactionReference)
@@ -188,6 +206,20 @@ public class PaystackPaymentServiceImpl implements PaymentService {
 
         log.warn("Payment Verification FAILED for escrow {}", escrowId);
         return false;
+    }
+
+    private BigDecimal computePaystackFee(BigDecimal amount) {
+        BigDecimal percentageFee = amount.multiply(paystackFeePercentage).divide(new BigDecimal("100"), 2, RoundingMode.HALF_UP);
+        BigDecimal fee = percentageFee.add(paystackFixedFee);
+        if (paystackFeeCap != null && paystackFeeCap.compareTo(BigDecimal.ZERO) > 0 && fee.compareTo(paystackFeeCap) > 0) {
+            fee = paystackFeeCap;
+        }
+        return fee.max(BigDecimal.ZERO);
+    }
+
+    private BigDecimal computePlatformFee(BigDecimal amount) {
+        BigDecimal pct = amount.multiply(platformFeePercentage).divide(new BigDecimal("100"), 2, RoundingMode.HALF_UP);
+        return pct.add(platformFixedFee).max(BigDecimal.ZERO);
     }
 
     private boolean verifyTransactionWithPaystack(String reference, long expectedAmountKobo) {
