@@ -6,7 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import com.payguard.api.entity.enumeration.LedgerStatus;
-import org.hibernate.annotations.UuidGenerator;
+import com.payguard.api.utils.UUIDv7Generator;
 
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -21,8 +21,6 @@ import java.util.UUID;
 public class FinancialLedger {
 
     @Id
-    @UuidGenerator(style = UuidGenerator.Style.TIME)
-    @GeneratedValue
     private UUID id;
 
     @OneToOne(fetch = FetchType.LAZY)
@@ -64,5 +62,12 @@ public class FinancialLedger {
     @PreUpdate
     protected void onUpdate() {
         this.updatedAt = Instant.now();
+    }
+
+    @PrePersist
+    protected void onCreate() {
+        if (this.id == null) {
+            this.id = UUIDv7Generator.generate();
+        }
     }
 }

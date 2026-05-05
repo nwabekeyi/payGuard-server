@@ -11,7 +11,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import com.payguard.api.entity.enumeration.AccountStatus;
 import com.payguard.api.entity.enumeration.KycType;
 import com.payguard.api.entity.enumeration.UserTier;
-import org.hibernate.annotations.UuidGenerator;
+import com.payguard.api.utils.UUIDv7Generator;
 
 import java.time.Instant;
 import java.util.Collection;
@@ -27,8 +27,6 @@ import java.util.UUID;
 public class User implements UserDetails {
 
     @Id
-    @UuidGenerator(style = UuidGenerator.Style.TIME)
-    @GeneratedValue
     private UUID id;
 
     @Column(nullable = false)
@@ -124,5 +122,12 @@ public class User implements UserDetails {
     @PreUpdate
     protected void onUpdate() {
         this.updatedAt = Instant.now();
+    }
+
+    @PrePersist
+    protected void onCreate() {
+        if (this.id == null) {
+            this.id = UUIDv7Generator.generate();
+        }
     }
 }

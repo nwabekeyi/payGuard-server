@@ -15,8 +15,6 @@ import com.payguard.api.repository.UserKycRepository;
 import com.payguard.api.repository.UserRepository;
 import com.payguard.api.service.BankService;
 import com.payguard.api.service.IdentityVerificationService;
-
-import java.util.NoSuchElementException;
 import java.util.UUID;
 
 @Slf4j

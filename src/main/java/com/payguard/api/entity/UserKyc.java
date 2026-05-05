@@ -2,8 +2,8 @@ package com.payguard.api.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.UuidGenerator;
 import com.payguard.api.entity.enumeration.KycType;
+import com.payguard.api.utils.UUIDv7Generator;
 
 import java.time.Instant;
 import java.util.UUID;
@@ -16,8 +16,6 @@ import java.util.UUID;
 @AllArgsConstructor
 public class UserKyc {
     @Id
-    @GeneratedValue
-    @UuidGenerator(style = UuidGenerator.Style.TIME)
     private UUID id;
 
     @OneToOne(fetch = FetchType.LAZY)
@@ -56,6 +54,13 @@ public class UserKyc {
     @Column(name = "updated_at", nullable = false)
     @Builder.Default
     private Instant updatedAt = Instant.now();
+
+    @PrePersist
+    protected void onCreate() {
+        if (this.id == null) {
+            this.id = UUIDv7Generator.generate();
+        }
+    }
 
     @PreUpdate
     void onUpdate(){ this.updatedAt = Instant.now(); }

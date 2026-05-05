@@ -4,12 +4,14 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.scheduling.annotation.EnableAsync;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 @SpringBootApplication
 @EnableAsync
 @EnableCaching
-public class OutlinrApplication {
+@EnableScheduling
+public class PayguardApplication {
 	public static void main(String[] args) {
-		SpringApplication.run(OutlinrApplication.class, args);
+		SpringApplication.run(PayguardApplication.class, args);
 	}
 }

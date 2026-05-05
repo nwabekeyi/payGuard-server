@@ -11,7 +11,7 @@
 		<version>4.0.3</version>
 		<relativePath /> <!-- lookup parent from repository -->
 	</parent>
-			<groupId>xyz.outlinr</groupId>
+			<groupId>com.payguard</groupId>
 	<artifactId>api</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>payguard</name>
@@ -99,12 +99,17 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-thymeleaf</artifactId>
 		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-validation</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.liquibase</groupId>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-validation</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+        </dependency>
+        
+        <dependency>
+            <groupId>org.liquibase</groupId>
 			<artifactId>liquibase-core</artifactId>
 		</dependency>
 		<dependency>
@@ -116,6 +121,11 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-liquibase</artifactId>
 		</dependency>
+        <dependency>
+            <groupId>com.github.rahulrishi</groupId>
+            <artifactId>rqueue-spring-boot-starter</artifactId>
+            <version>2.0.0</version>
+        </dependency>
 	</dependencies>
 
 	<build>
@@ -152,15 +162,15 @@
 				<version>4.24.0</version>
 				<configuration>
 					<changeLogFile
-                    >src/main/resources/db/changelog/db.changelog-master.yaml</changeLogFile>
+                        >src/main/resources/db/changelog/db.changelog-master.yaml</changeLogFile>
 					<url>jdbc:postgresql://localhost:5432/payguard</url>
 					<username>user</username>
 					<password />
 					<driver>org.postgresql.Driver</driver>
 					<referenceUrl
-                    >hibernate:spring:xyz.outlinr.api.entity?dialect=org.hibernate.dialect.PostgreSQLDialect&amp;hibernate.physical_naming_strategy=org.hibernate.boot.model.naming.CamelCaseToUnderscoresNamingStrategy</referenceUrl>
+                        >hibernate:spring:xyz.outlinr.api.entity?dialect=org.hibernate.dialect.PostgreSQLDialect&amp;hibernate.physical_naming_strategy=org.hibernate.boot.model.naming.CamelCaseToUnderscoresNamingStrategy</referenceUrl>
 					<referenceDriver
-                    >liquibase.ext.hibernate.database.connection.HibernateDriver</referenceDriver>
+                        >liquibase.ext.hibernate.database.connection.HibernateDriver</referenceDriver>
 					<outputNamespace>db.changelog.changesets</outputNamespace>
 				</configuration>
 				<dependencies>

@@ -6,7 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import com.payguard.api.entity.enumeration.EscrowStatus;
-import org.hibernate.annotations.UuidGenerator;
+import com.payguard.api.utils.UUIDv7Generator;
 
 import java.time.Instant;
 import java.util.UUID;
@@ -20,8 +20,6 @@ import java.util.UUID;
 public class EscrowStatusHistory {
 
     @Id
-    @UuidGenerator(style = UuidGenerator.Style.TIME)
-    @GeneratedValue
     private UUID id;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -45,4 +43,11 @@ public class EscrowStatusHistory {
     @Column(nullable = false, updatable = false)
     @Builder.Default
     private Instant timestamp = Instant.now();
+
+    @PrePersist
+    protected void onCreate() {
+        if (this.id == null) {
+            this.id = UUIDv7Generator.generate();
+        }
+    }
 }

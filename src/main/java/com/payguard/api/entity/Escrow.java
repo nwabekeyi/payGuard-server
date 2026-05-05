@@ -7,7 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import com.payguard.api.entity.enumeration.*;
 import com.payguard.api.utils.EscrowDefaults;
-import org.hibernate.annotations.UuidGenerator;
+import com.payguard.api.utils.UUIDv7Generator;
 
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -24,8 +24,6 @@ import java.util.UUID;
 public class Escrow {
 
     @Id
-    @UuidGenerator(style = UuidGenerator.Style.TIME)
-    @GeneratedValue
     private UUID id;
 
     @Column(nullable = false)
@@ -114,5 +112,12 @@ public class Escrow {
     @PreUpdate
     protected void onUpdate() {
         this.updatedAt = Instant.now();
+    }
+
+    @PrePersist
+    protected void onCreate() {
+        if (this.id == null) {
+            this.id = UUIDv7Generator.generate();
+        }
     }
 }

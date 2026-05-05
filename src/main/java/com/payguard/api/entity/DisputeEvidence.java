@@ -2,7 +2,7 @@ package com.payguard.api.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.UuidGenerator;
+import com.payguard.api.utils.UUIDv7Generator;
 
 import java.time.Instant;
 import java.util.UUID;
@@ -16,9 +16,6 @@ import java.util.UUID;
 @AllArgsConstructor
 public class DisputeEvidence {
     @Id
-    @UuidGenerator(style = UuidGenerator.Style.TIME)
-    @GeneratedValue
-    @Column(updatable = false, nullable = false)
     private UUID id;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -26,16 +23,16 @@ public class DisputeEvidence {
     private Dispute dispute;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "uploaded_by_user_id", nullable = false)
+    @JoinColumn(name = "uploaded_by")
     private User uploadedBy;
 
-    @Column(columnDefinition = "TEXT", nullable = false)
+    @Column(name = "file_url", columnDefinition = "TEXT", nullable = false)
     private String fileUrl;
 
-    @Column(nullable = false, length = 50)
-    private String fileType; // image/jpeg, application/pdf, etc.
-    
-    @Column(length = 255)
+    @Column(name = "file_type")
+    private String fileType;
+
+    @Column(name = "original_file_name")
     private String originalFileName;
 
     @Column(name = "uploaded_at", updatable = false)
@@ -43,6 +40,9 @@ public class DisputeEvidence {
 
     @PrePersist
     protected void onCreate() {
-        uploadedAt = Instant.now();
+        if (this.id == null) {
+            this.id = UUIDv7Generator.generate();
+        }
+        this.uploadedAt = Instant.now();
     }
 }

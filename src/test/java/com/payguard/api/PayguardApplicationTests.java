@@ -6,7 +6,7 @@ import org.springframework.test.context.ActiveProfiles;
 
 @SpringBootTest
 @ActiveProfiles("dev")
-class OutlinrApplicationTests {
+class PayguardApplicationTests {
 
 	@Test
 	void contextLoads() {
