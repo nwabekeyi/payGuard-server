@@ -1,10 +1,10 @@
-package com.payguard.service.impl;
+package com.payguard.api.service.impl;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-import com.payguard.entity.Dispute;
-import com.payguard.service.CriticalTaskQueueService;
+import com.payguard.api.entity.Dispute;
+import com.payguard.api.service.CriticalTaskQueueService;
 
 @Slf4j
 @Service

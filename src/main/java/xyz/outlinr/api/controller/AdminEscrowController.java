@@ -1,14 +1,14 @@
-package com.payguard.controller;
+package com.payguard.api.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-import com.payguard.dto.request.ResolveDisputeRequest;
-import com.payguard.dto.response.AdminDashboardResponse;
-import com.payguard.dto.response.DisputeResponse;
-import com.payguard.entity.User;
-import com.payguard.service.AdminEscrowService;
+import com.payguard.api.dto.request.ResolveDisputeRequest;
+import com.payguard.api.dto.response.AdminDashboardResponse;
+import com.payguard.api.dto.response.DisputeResponse;
+import com.payguard.api.entity.User;
+import com.payguard.api.service.AdminEscrowService;
 
 import java.util.UUID;
 

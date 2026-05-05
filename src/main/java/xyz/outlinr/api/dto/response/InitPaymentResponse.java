@@ -1,4 +1,4 @@
-package com.payguard.dto.response;
+package com.payguard.api.dto.response;
 
 import lombok.Builder;
 import lombok.Data;

@@ -1,4 +1,4 @@
-package com.payguard.entity;
+package com.payguard.api.entity;
 
 import jakarta.persistence.*;
 import lombok.*;

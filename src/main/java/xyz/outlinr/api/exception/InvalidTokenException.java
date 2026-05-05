@@ -1,4 +1,4 @@
-package com.payguard.exception;
+package com.payguard.api.exception;
 
 public class InvalidTokenException extends RuntimeException {
     public InvalidTokenException(String message) {

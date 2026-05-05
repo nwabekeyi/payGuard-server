@@ -1,4 +1,4 @@
-package com.payguard.entity;
+package com.payguard.api.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -8,9 +8,9 @@ import lombok.NoArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import com.payguard.entity.enumeration.AccountStatus;
-import com.payguard.entity.enumeration.KycType;
-import com.payguard.entity.enumeration.UserTier;
+import com.payguard.api.entity.enumeration.AccountStatus;
+import com.payguard.api.entity.enumeration.KycType;
+import com.payguard.api.entity.enumeration.UserTier;
 import org.hibernate.annotations.UuidGenerator;
 
 import java.time.Instant;

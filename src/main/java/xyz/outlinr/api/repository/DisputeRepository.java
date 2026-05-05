@@ -1,9 +1,9 @@
-package com.payguard.repository;
+package com.payguard.api.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-import com.payguard.entity.Dispute;
-import com.payguard.entity.enumeration.DisputeStatus;
+import com.payguard.api.entity.Dispute;
+import com.payguard.api.entity.enumeration.DisputeStatus;
 
 import java.time.Instant;
 import java.util.List;

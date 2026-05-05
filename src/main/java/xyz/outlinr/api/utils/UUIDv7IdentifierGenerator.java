@@ -1,4 +1,4 @@
-package com.payguard.utils;
+package com.payguard.api.utils;
 
 import java.util.UUID;
 import org.hibernate.HibernateException;

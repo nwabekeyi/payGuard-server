@@ -1,4 +1,4 @@
-package com.payguard.controller;
+package com.payguard.api.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -9,10 +9,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import com.payguard.dto.request.IdentityVerificationRequest;
-import com.payguard.dto.response.IdentityVerificationResponse;
-import com.payguard.entity.User;
-import com.payguard.service.IdentityVerificationService;
+import com.payguard.api.dto.request.IdentityVerificationRequest;
+import com.payguard.api.dto.response.IdentityVerificationResponse;
+import com.payguard.api.entity.User;
+import com.payguard.api.service.IdentityVerificationService;
 
 @Slf4j
 @RestController

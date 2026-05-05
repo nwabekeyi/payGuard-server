@@ -1,7 +1,7 @@
-package com.payguard.service;
+package com.payguard.api.service;
 
-import com.payguard.entity.Escrow;
-import com.payguard.entity.User;
+import com.payguard.api.entity.Escrow;
+import com.payguard.api.entity.User;
 
 public interface EmailService {
     /**

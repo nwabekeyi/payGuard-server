@@ -1,4 +1,4 @@
-package com.payguard.controller;
+package com.payguard.api.controller;
 
 import jakarta.validation.Valid;
 import jakarta.servlet.http.HttpServletRequest;
@@ -9,11 +9,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import com.payguard.dto.request.*;
-import com.payguard.dto.response.*;
-import com.payguard.entity.User;
-import com.payguard.security.CookieService;
-import com.payguard.service.AuthService;
+import com.payguard.api.dto.request.*;
+import com.payguard.api.dto.response.*;
+import com.payguard.api.entity.User;
+import com.payguard.api.security.CookieService;
+import com.payguard.api.service.AuthService;
 
 import java.util.Map;
 

@@ -1,9 +1,9 @@
-package com.payguard.service;
+package com.payguard.api.service;
 
-import com.payguard.dto.request.ResolveDisputeRequest;
-import com.payguard.dto.response.AdminDashboardResponse;
-import com.payguard.dto.response.DisputeResponse;
-import com.payguard.entity.User;
+import com.payguard.api.dto.request.ResolveDisputeRequest;
+import com.payguard.api.dto.response.AdminDashboardResponse;
+import com.payguard.api.dto.response.DisputeResponse;
+import com.payguard.api.entity.User;
 
 import java.util.UUID;
 

@@ -1,22 +1,22 @@
-package com.payguard.service.impl;
+package com.payguard.api.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import com.payguard.dto.request.ResolveDisputeRequest;
-import com.payguard.dto.response.AdminDashboardResponse;
-import com.payguard.dto.response.DisputeResponse;
-import com.payguard.entity.User;
-import com.payguard.entity.enumeration.DisputeStatus;
-import com.payguard.entity.enumeration.EscrowStatus;
-import com.payguard.entity.enumeration.LedgerStatus;
-import com.payguard.repository.DisputeRepository;
-import com.payguard.repository.EscrowRepository;
-import com.payguard.repository.FinancialLedgerRepository;
-import com.payguard.service.AdminEscrowService;
-import com.payguard.service.DisputeService;
+import com.payguard.api.dto.request.ResolveDisputeRequest;
+import com.payguard.api.dto.response.AdminDashboardResponse;
+import com.payguard.api.dto.response.DisputeResponse;
+import com.payguard.api.entity.User;
+import com.payguard.api.entity.enumeration.DisputeStatus;
+import com.payguard.api.entity.enumeration.EscrowStatus;
+import com.payguard.api.entity.enumeration.LedgerStatus;
+import com.payguard.api.repository.DisputeRepository;
+import com.payguard.api.repository.EscrowRepository;
+import com.payguard.api.repository.FinancialLedgerRepository;
+import com.payguard.api.service.AdminEscrowService;
+import com.payguard.api.service.DisputeService;
 
 import java.util.UUID;
 

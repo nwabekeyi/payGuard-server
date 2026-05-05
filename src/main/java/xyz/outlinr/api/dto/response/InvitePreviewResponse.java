@@ -1,7 +1,7 @@
-package com.payguard.dto.response;
+package com.payguard.api.dto.response;
 
-import com.payguard.entity.enumeration.DeliveryType;
-import com.payguard.entity.enumeration.ParticipantRole;
+import com.payguard.api.entity.enumeration.DeliveryType;
+import com.payguard.api.entity.enumeration.ParticipantRole;
 
 import java.math.BigDecimal;
 

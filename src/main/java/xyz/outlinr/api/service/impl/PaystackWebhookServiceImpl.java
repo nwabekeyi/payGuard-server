@@ -1,4 +1,4 @@
-package com.payguard.service.impl;
+package com.payguard.api.service.impl;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -8,12 +8,12 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import com.payguard.entity.Escrow;
-import com.payguard.entity.enumeration.EscrowStatus;
-import com.payguard.entity.enumeration.LedgerStatus;
-import com.payguard.repository.EscrowRepository;
-import com.payguard.repository.FinancialLedgerRepository;
-import com.payguard.service.PaystackWebhookService;
+import com.payguard.api.entity.Escrow;
+import com.payguard.api.entity.enumeration.EscrowStatus;
+import com.payguard.api.entity.enumeration.LedgerStatus;
+import com.payguard.api.repository.EscrowRepository;
+import com.payguard.api.repository.FinancialLedgerRepository;
+import com.payguard.api.service.PaystackWebhookService;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;

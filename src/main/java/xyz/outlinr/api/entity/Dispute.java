@@ -1,11 +1,11 @@
-package com.payguard.entity;
+package com.payguard.api.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.UuidGenerator;
 
-import com.payguard.entity.enumeration.DisputeResolution;
-import com.payguard.entity.enumeration.DisputeStatus;
+import com.payguard.api.entity.enumeration.DisputeResolution;
+import com.payguard.api.entity.enumeration.DisputeStatus;
 
 import java.time.Instant;
 import java.util.ArrayList;

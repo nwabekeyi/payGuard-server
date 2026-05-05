@@ -1,4 +1,4 @@
-package com.payguard.controller;
+package com.payguard.api.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import com.payguard.service.PaystackWebhookService;
+import com.payguard.api.service.PaystackWebhookService;
 
 import java.util.Map;
 

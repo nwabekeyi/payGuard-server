@@ -1,6 +1,6 @@
-package com.payguard.dto.request;
+package com.payguard.api.dto.request;
 
-import com.payguard.entity.enumeration.EscrowStatus;
+import com.payguard.api.entity.enumeration.EscrowStatus;
 
 public record StatusTransitionRequest(
         EscrowStatus toStatus,

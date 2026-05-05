@@ -1,12 +1,12 @@
-package com.payguard.repository;
+package com.payguard.api.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-import com.payguard.entity.FinancialLedger;
-import com.payguard.entity.Escrow;
+import com.payguard.api.entity.FinancialLedger;
+import com.payguard.api.entity.Escrow;
 
 import java.util.Optional;
-import com.payguard.entity.enumeration.LedgerStatus;
+import com.payguard.api.entity.enumeration.LedgerStatus;
 import java.util.UUID;
 
 @Repository

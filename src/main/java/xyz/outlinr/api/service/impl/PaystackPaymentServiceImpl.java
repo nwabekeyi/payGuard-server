@@ -1,4 +1,4 @@
-package com.payguard.service.impl;
+package com.payguard.api.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -8,21 +8,21 @@ import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
-import com.payguard.config.PaystackConfig;
-import com.payguard.dto.request.CreateEscrowRequest;
-import com.payguard.dto.request.VerifyAndCreateEscrowRequest;
-import com.payguard.entity.Escrow;
-import com.payguard.entity.EscrowStatusHistory;
-import com.payguard.entity.FinancialLedger;
-import com.payguard.entity.User;
-import com.payguard.entity.enumeration.EscrowStatus;
-import com.payguard.entity.enumeration.LedgerStatus;
-import com.payguard.dto.response.InitPaymentResponse;
-import com.payguard.dto.response.VerifyPaymentResponse;
-import com.payguard.repository.EscrowRepository;
-import com.payguard.repository.FinancialLedgerRepository;
-import com.payguard.service.EmailService;
-import com.payguard.service.PaymentService;
+import com.payguard.api.config.PaystackConfig;
+import com.payguard.api.dto.request.CreateEscrowRequest;
+import com.payguard.api.dto.request.VerifyAndCreateEscrowRequest;
+import com.payguard.api.entity.Escrow;
+import com.payguard.api.entity.EscrowStatusHistory;
+import com.payguard.api.entity.FinancialLedger;
+import com.payguard.api.entity.User;
+import com.payguard.api.entity.enumeration.EscrowStatus;
+import com.payguard.api.entity.enumeration.LedgerStatus;
+import com.payguard.api.dto.response.InitPaymentResponse;
+import com.payguard.api.dto.response.VerifyPaymentResponse;
+import com.payguard.api.repository.EscrowRepository;
+import com.payguard.api.repository.FinancialLedgerRepository;
+import com.payguard.api.service.EmailService;
+import com.payguard.api.service.PaymentService;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -160,7 +160,7 @@ public class PaystackPaymentServiceImpl implements PaymentService {
             EscrowStatus fromStatus = escrow.getStatus();
 
             boolean sellerAccepted = escrow.getParticipants().stream()
-                    .filter(p -> p.getRole() == com.payguard.entity.enumeration.ParticipantRole.SELLER)
+                    .filter(p -> p.getRole() == com.payguard.api.entity.enumeration.ParticipantRole.SELLER)
                     .anyMatch(p -> p.getInviteAccepted() != null && p.getInviteAccepted());
 
             EscrowStatus nextStatus = sellerAccepted ? EscrowStatus.FUNDED : EscrowStatus.PENDING_ACCEPTANCE;

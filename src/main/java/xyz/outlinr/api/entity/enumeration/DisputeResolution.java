@@ -1,4 +1,4 @@
-package com.payguard.entity.enumeration;
+package com.payguard.api.entity.enumeration;
 
 public enum DisputeResolution {
     REFUNDED, // Refunded to Buyer

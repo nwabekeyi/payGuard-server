@@ -1,12 +1,12 @@
-package com.payguard.entity;
+package com.payguard.api.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import com.payguard.entity.enumeration.*;
-import com.payguard.utils.EscrowDefaults;
+import com.payguard.api.entity.enumeration.*;
+import com.payguard.api.utils.EscrowDefaults;
 import org.hibernate.annotations.UuidGenerator;
 
 import java.math.BigDecimal;

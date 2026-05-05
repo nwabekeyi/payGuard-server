@@ -1,4 +1,4 @@
-package com.payguard.controller;
+package com.payguard.api.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -6,11 +6,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-import com.payguard.dto.request.*;
-import com.payguard.dto.response.*;
-import com.payguard.entity.enumeration.EscrowStatus;
-import com.payguard.entity.User;
-import com.payguard.service.EscrowService;
+import com.payguard.api.dto.request.*;
+import com.payguard.api.dto.response.*;
+import com.payguard.api.entity.enumeration.EscrowStatus;
+import com.payguard.api.entity.User;
+import com.payguard.api.service.EscrowService;
 
 import java.util.List;
 import java.util.UUID;

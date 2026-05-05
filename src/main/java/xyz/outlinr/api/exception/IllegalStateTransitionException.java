@@ -1,4 +1,4 @@
-package com.payguard.exception;
+package com.payguard.api.exception;
 
 public class IllegalStateTransitionException extends RuntimeException {
     public IllegalStateTransitionException(String message) {

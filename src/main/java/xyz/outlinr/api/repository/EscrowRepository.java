@@ -1,12 +1,12 @@
-package com.payguard.repository;
+package com.payguard.api.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import com.payguard.entity.Escrow;
-import com.payguard.entity.enumeration.EscrowStatus;
-import com.payguard.entity.User;
+import com.payguard.api.entity.Escrow;
+import com.payguard.api.entity.enumeration.EscrowStatus;
+import com.payguard.api.entity.User;
 
 import java.util.List;
 import java.util.UUID;

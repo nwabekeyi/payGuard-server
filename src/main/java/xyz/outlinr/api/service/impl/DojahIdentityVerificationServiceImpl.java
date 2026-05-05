@@ -1,20 +1,20 @@
-package com.payguard.service.impl;
+package com.payguard.api.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import com.payguard.config.DojahConfig;
-import com.payguard.dto.request.IdentityVerificationRequest;
-import com.payguard.dto.response.IdentityVerificationResponse;
-import com.payguard.entity.User;
-import com.payguard.entity.UserKyc;
-import com.payguard.entity.enumeration.KycType;
-import com.payguard.model.AccountDetail;
-import com.payguard.repository.UserKycRepository;
-import com.payguard.repository.UserRepository;
-import com.payguard.service.BankService;
-import com.payguard.service.IdentityVerificationService;
+import com.payguard.api.config.DojahConfig;
+import com.payguard.api.dto.request.IdentityVerificationRequest;
+import com.payguard.api.dto.response.IdentityVerificationResponse;
+import com.payguard.api.entity.User;
+import com.payguard.api.entity.UserKyc;
+import com.payguard.api.entity.enumeration.KycType;
+import com.payguard.api.model.AccountDetail;
+import com.payguard.api.repository.UserKycRepository;
+import com.payguard.api.repository.UserRepository;
+import com.payguard.api.service.BankService;
+import com.payguard.api.service.IdentityVerificationService;
 
 import java.util.NoSuchElementException;
 import java.util.UUID;

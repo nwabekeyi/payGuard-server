@@ -1,6 +1,6 @@
-package com.payguard.dto.response;
+package com.payguard.api.dto.response;
 
-import com.payguard.entity.enumeration.ParticipantRole;
+import com.payguard.api.entity.enumeration.ParticipantRole;
 
 import java.time.Instant;
 import java.util.UUID;

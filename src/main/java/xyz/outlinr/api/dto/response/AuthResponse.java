@@ -1,4 +1,4 @@
-package com.payguard.dto.response;
+package com.payguard.api.dto.response;
 
 import java.util.UUID;
 

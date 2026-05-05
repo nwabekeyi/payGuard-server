@@ -1,4 +1,4 @@
-package com.payguard.controller;
+package com.payguard.api.controller;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;

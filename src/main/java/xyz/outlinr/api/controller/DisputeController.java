@@ -1,4 +1,4 @@
-package com.payguard.controller;
+package com.payguard.api.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -6,12 +6,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import com.payguard.dto.request.CreateDisputeRequest;
-import com.payguard.dto.request.ResolveDisputeRequest;
-import com.payguard.dto.response.DisputeEvidenceResponse;
-import com.payguard.dto.response.DisputeResponse;
-import com.payguard.entity.User;
-import com.payguard.service.DisputeService;
+import com.payguard.api.dto.request.CreateDisputeRequest;
+import com.payguard.api.dto.request.ResolveDisputeRequest;
+import com.payguard.api.dto.response.DisputeEvidenceResponse;
+import com.payguard.api.dto.response.DisputeResponse;
+import com.payguard.api.entity.User;
+import com.payguard.api.service.DisputeService;
 
 import java.util.List;
 import java.util.UUID;

@@ -1,9 +1,9 @@
-package com.payguard.entity;
+package com.payguard.api.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.UuidGenerator;
-import com.payguard.entity.enumeration.KycType;
+import com.payguard.api.entity.enumeration.KycType;
 
 import java.time.Instant;
 import java.util.UUID;

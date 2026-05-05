@@ -1,6 +1,6 @@
-package com.payguard.service;
+package com.payguard.api.service;
 
-import com.payguard.entity.Dispute;
+import com.payguard.api.entity.Dispute;
 
 public interface CriticalTaskQueueService {
     void enqueueDisputeResolvedTask(Dispute dispute);

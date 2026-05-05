@@ -1,4 +1,4 @@
-package com.payguard.config;
+package com.payguard.api.config;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;

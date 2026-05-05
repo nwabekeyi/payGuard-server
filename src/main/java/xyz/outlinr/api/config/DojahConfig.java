@@ -1,4 +1,4 @@
-package com.payguard.config;
+package com.payguard.api.config;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;

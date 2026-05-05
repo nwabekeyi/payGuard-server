@@ -1,4 +1,4 @@
-package com.payguard.service.impl;
+package com.payguard.api.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -7,17 +7,17 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import com.payguard.dto.request.*;
-import com.payguard.dto.response.*;
-import com.payguard.entity.enumeration.AccountStatus;
-import com.payguard.entity.enumeration.UserTier;
-import com.payguard.entity.User;
-import com.payguard.exception.InvalidCredentialsException;
-import com.payguard.exception.InvalidTokenException;
-import com.payguard.exception.UserAlreadyExistsException;
-import com.payguard.repository.UserRepository;
-import com.payguard.security.JwtService;
-import com.payguard.service.AuthService;
+import com.payguard.api.dto.request.*;
+import com.payguard.api.dto.response.*;
+import com.payguard.api.entity.enumeration.AccountStatus;
+import com.payguard.api.entity.enumeration.UserTier;
+import com.payguard.api.entity.User;
+import com.payguard.api.exception.InvalidCredentialsException;
+import com.payguard.api.exception.InvalidTokenException;
+import com.payguard.api.exception.UserAlreadyExistsException;
+import com.payguard.api.repository.UserRepository;
+import com.payguard.api.security.JwtService;
+import com.payguard.api.service.AuthService;
 
 @Service
 @RequiredArgsConstructor

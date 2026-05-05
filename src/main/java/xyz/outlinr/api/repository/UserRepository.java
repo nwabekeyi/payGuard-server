@@ -1,7 +1,7 @@
-package com.payguard.repository;
+package com.payguard.api.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import com.payguard.entity.User;
+import com.payguard.api.entity.User;
 
 import java.util.Optional;
 import java.util.UUID;

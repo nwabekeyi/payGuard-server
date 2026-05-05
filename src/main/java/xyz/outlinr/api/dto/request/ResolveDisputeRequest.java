@@ -1,7 +1,7 @@
-package com.payguard.dto.request;
+package com.payguard.api.dto.request;
 
 import jakarta.validation.constraints.NotNull;
-import com.payguard.entity.enumeration.DisputeResolution;
+import com.payguard.api.entity.enumeration.DisputeResolution;
 
 public record ResolveDisputeRequest(
         @NotNull(message = "Resolution is required")
