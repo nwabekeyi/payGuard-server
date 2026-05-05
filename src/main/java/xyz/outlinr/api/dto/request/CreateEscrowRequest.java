@@ -1,9 +1,9 @@
-package xyz.outlinr.api.dto.request;
+package com.payguard.api.dto.request;
 
-import xyz.outlinr.api.entity.enumeration.ConfirmationMethod;
-import xyz.outlinr.api.entity.enumeration.DeliveryType;
-import xyz.outlinr.api.entity.enumeration.ParticipationMode;
-import xyz.outlinr.api.entity.enumeration.ShippingResponsibility;
+import com.payguard.api.entity.enumeration.ConfirmationMethod;
+import com.payguard.api.entity.enumeration.DeliveryType;
+import com.payguard.api.entity.enumeration.ParticipationMode;
+import com.payguard.api.entity.enumeration.ShippingResponsibility;
 
 import java.math.BigDecimal;
 

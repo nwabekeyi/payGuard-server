@@ -1,11 +1,11 @@
-package xyz.outlinr.api.entity;
+package com.payguard.api.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import xyz.outlinr.api.entity.enumeration.ParticipantRole;
+import com.payguard.api.entity.enumeration.ParticipantRole;
 import org.hibernate.annotations.UuidGenerator;
 
 import java.time.Instant;
@@ -20,7 +20,7 @@ import java.util.UUID;
 public class EscrowParticipant {
 
     @Id
-    @UuidGenerator(style = "UNIX_EPOCH")
+    @UuidGenerator(style = UuidGenerator.Style.TIME)
     @GeneratedValue
     private UUID id;
 

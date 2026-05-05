@@ -1,26 +1,28 @@
-package xyz.outlinr.api.service.impl;
+package com.payguard.api.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-import xyz.outlinr.api.dto.request.CreateDisputeRequest;
-import xyz.outlinr.api.dto.request.ResolveDisputeRequest;
-import xyz.outlinr.api.dto.response.DisputeEvidenceResponse;
-import xyz.outlinr.api.dto.response.DisputeResponse;
-import xyz.outlinr.api.entity.*;
-import xyz.outlinr.api.entity.enumeration.DisputeResolution;
-import xyz.outlinr.api.entity.enumeration.DisputeStatus;
-import xyz.outlinr.api.entity.enumeration.EscrowStatus;
-import xyz.outlinr.api.entity.enumeration.LedgerStatus;
-import xyz.outlinr.api.repository.DisputeEvidenceRepository;
-import xyz.outlinr.api.repository.DisputeRepository;
-import xyz.outlinr.api.repository.EscrowRepository;
-import xyz.outlinr.api.repository.FinancialLedgerRepository;
-import xyz.outlinr.api.service.DisputeService;
+import com.payguard.api.dto.request.CreateDisputeRequest;
+import com.payguard.api.dto.request.ResolveDisputeRequest;
+import com.payguard.api.dto.response.DisputeEvidenceResponse;
+import com.payguard.api.dto.response.DisputeResponse;
+import com.payguard.api.entity.*;
+import com.payguard.api.entity.enumeration.DisputeResolution;
+import com.payguard.api.entity.enumeration.DisputeStatus;
+import com.payguard.api.entity.enumeration.EscrowStatus;
+import com.payguard.api.entity.enumeration.LedgerStatus;
+import com.payguard.api.repository.DisputeEvidenceRepository;
+import com.payguard.api.repository.DisputeRepository;
+import com.payguard.api.repository.EscrowRepository;
+import com.payguard.api.repository.FinancialLedgerRepository;
+import com.payguard.api.service.CriticalTaskQueueService;
+import com.payguard.api.service.DisputeService;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -41,11 +43,13 @@ public class DisputeServiceImpl implements DisputeService {
     private final DisputeEvidenceRepository evidenceRepository;
     private final EscrowRepository escrowRepository;
     private final FinancialLedgerRepository ledgerRepository;
+    private final CriticalTaskQueueService criticalTaskQueueService;
 
     @Value("${app.upload.dir:uploads/disputes}")
     private String uploadDir;
 
     @Override
+    @CacheEvict(value = "adminDashboard", allEntries = true)
     @Transactional
     public DisputeResponse raiseDispute(UUID escrowId, CreateDisputeRequest request, User currentUser) {
         Escrow escrow = escrowRepository.findById(escrowId)
@@ -180,6 +184,7 @@ public class DisputeServiceImpl implements DisputeService {
     }
 
     @Override
+    @CacheEvict(value = "adminDashboard", allEntries = true)
     @Transactional
     public DisputeResponse resolveDispute(UUID disputeId, ResolveDisputeRequest request, User adminUser) {
         Dispute dispute = disputeRepository.findById(disputeId)
@@ -220,7 +225,7 @@ public class DisputeServiceImpl implements DisputeService {
         escrowRepository.save(escrow);
         ledgerRepository.save(ledger);
         Dispute saved = disputeRepository.save(dispute);
-        
+        criticalTaskQueueService.enqueueDisputeResolvedTask(saved);
         return toResponse(saved);
     }
 

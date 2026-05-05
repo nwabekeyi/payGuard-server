@@ -1,29 +1,31 @@
-package xyz.outlinr.api.service.impl;
+package com.payguard.api.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
-import xyz.outlinr.api.config.PaystackConfig;
-import xyz.outlinr.api.dto.request.CreateEscrowRequest;
-import xyz.outlinr.api.dto.request.VerifyAndCreateEscrowRequest;
-import xyz.outlinr.api.entity.Escrow;
-import xyz.outlinr.api.entity.EscrowStatusHistory;
-import xyz.outlinr.api.entity.FinancialLedger;
-import xyz.outlinr.api.entity.User;
-import xyz.outlinr.api.entity.enumeration.EscrowStatus;
-import xyz.outlinr.api.entity.enumeration.LedgerStatus;
-import xyz.outlinr.api.dto.response.InitPaymentResponse;
-import xyz.outlinr.api.dto.response.VerifyPaymentResponse;
-import xyz.outlinr.api.repository.EscrowRepository;
-import xyz.outlinr.api.repository.FinancialLedgerRepository;
-import xyz.outlinr.api.service.EmailService;
-import xyz.outlinr.api.service.PaymentService;
+import com.payguard.api.config.PaystackConfig;
+import com.payguard.api.dto.request.CreateEscrowRequest;
+import com.payguard.api.dto.request.VerifyAndCreateEscrowRequest;
+import com.payguard.api.entity.Escrow;
+import com.payguard.api.entity.EscrowStatusHistory;
+import com.payguard.api.entity.FinancialLedger;
+import com.payguard.api.entity.User;
+import com.payguard.api.entity.enumeration.EscrowStatus;
+import com.payguard.api.entity.enumeration.LedgerStatus;
+import com.payguard.api.dto.response.InitPaymentResponse;
+import com.payguard.api.dto.response.VerifyPaymentResponse;
+import com.payguard.api.repository.EscrowRepository;
+import com.payguard.api.repository.FinancialLedgerRepository;
+import com.payguard.api.service.EmailService;
+import com.payguard.api.service.PaymentService;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.UUID;
@@ -37,10 +39,21 @@ public class PaystackPaymentServiceImpl implements PaymentService {
     private final EscrowRepository escrowRepository;
     private final FinancialLedgerRepository ledgerRepository;
     private final EmailService emailService;
+    private final RedisTemplate<String, Object> redisTemplate;
     private final RestTemplate restTemplate = new RestTemplate();
 
     @Value("${app.frontend.url:http://localhost:5173}")
     private String frontendUrl;
+    @Value("${app.fees.platform.percentage:1.50}")
+    private BigDecimal platformFeePercentage;
+    @Value("${app.fees.platform.fixed-ngn:0}")
+    private BigDecimal platformFixedFee;
+    @Value("${app.fees.paystack.percentage:1.50}")
+    private BigDecimal paystackFeePercentage;
+    @Value("${app.fees.paystack.fixed-ngn:100}")
+    private BigDecimal paystackFixedFee;
+    @Value("${app.fees.paystack.cap-ngn:2000}")
+    private BigDecimal paystackFeeCap;
 
     @Override
     @Transactional
@@ -123,7 +136,14 @@ public class PaystackPaymentServiceImpl implements PaymentService {
     @Override
     @Transactional
     public boolean verifyAndFundEscrow(UUID escrowId, String transactionReference, long amountInKobo) {
-        Escrow escrow = escrowRepository.findById(escrowId)
+        String idempotencyKey = "payment:verify:" + transactionReference;
+        Boolean first = redisTemplate.opsForValue().setIfAbsent(idempotencyKey, "PROCESSING", java.time.Duration.ofMinutes(30));
+        if (Boolean.FALSE.equals(first)) {
+            log.info("Skipping duplicate verify request for reference {}", transactionReference);
+            return true;
+        }
+
+        Escrow escrow = escrowRepository.findByIdForUpdate(escrowId)
                 .orElseThrow(() -> new NoSuchElementException("Escrow not found: " + escrowId));
 
         // Already funded?
@@ -140,7 +160,7 @@ public class PaystackPaymentServiceImpl implements PaymentService {
             EscrowStatus fromStatus = escrow.getStatus();
 
             boolean sellerAccepted = escrow.getParticipants().stream()
-                    .filter(p -> p.getRole() == xyz.outlinr.api.entity.enumeration.ParticipantRole.SELLER)
+                    .filter(p -> p.getRole() == com.payguard.api.entity.enumeration.ParticipantRole.SELLER)
                     .anyMatch(p -> p.getInviteAccepted() != null && p.getInviteAccepted());
 
             EscrowStatus nextStatus = sellerAccepted ? EscrowStatus.FUNDED : EscrowStatus.PENDING_ACCEPTANCE;
@@ -157,14 +177,23 @@ public class PaystackPaymentServiceImpl implements PaymentService {
             escrow.getStatusHistory().add(history);
             escrowRepository.save(escrow);
 
-            FinancialLedger ledger = FinancialLedger.builder()
-                    .escrow(escrow)
-                    .amount(escrow.getAmount())
-                    .currency(escrow.getCurrency())
-                    .status(LedgerStatus.HELD)
-                    .paymentReference(transactionReference)
-                    .build();
-            ledgerRepository.save(ledger);
+            if (ledgerRepository.findByEscrow(escrow).isEmpty()) {
+                BigDecimal grossAmount = escrow.getAmount();
+                BigDecimal paystackFee = computePaystackFee(grossAmount);
+                BigDecimal platformFee = computePlatformFee(grossAmount);
+                BigDecimal netPayout = grossAmount.subtract(paystackFee).subtract(platformFee).max(BigDecimal.ZERO);
+                FinancialLedger ledger = FinancialLedger.builder()
+                        .escrow(escrow)
+                        .amount(grossAmount)
+                        .paystackFee(paystackFee)
+                        .platformFee(platformFee)
+                        .netPayoutAmount(netPayout)
+                        .currency(escrow.getCurrency())
+                        .status(LedgerStatus.HELD)
+                        .paymentReference(transactionReference)
+                        .build();
+                ledgerRepository.save(ledger);
+            }
 
             try {
                 emailService.sendEscrowInviteEmails(escrow, escrow.getCreatedBy());
@@ -177,6 +206,20 @@ public class PaystackPaymentServiceImpl implements PaymentService {
 
         log.warn("Payment Verification FAILED for escrow {}", escrowId);
         return false;
+    }
+
+    private BigDecimal computePaystackFee(BigDecimal amount) {
+        BigDecimal percentageFee = amount.multiply(paystackFeePercentage).divide(new BigDecimal("100"), 2, RoundingMode.HALF_UP);
+        BigDecimal fee = percentageFee.add(paystackFixedFee);
+        if (paystackFeeCap != null && paystackFeeCap.compareTo(BigDecimal.ZERO) > 0 && fee.compareTo(paystackFeeCap) > 0) {
+            fee = paystackFeeCap;
+        }
+        return fee.max(BigDecimal.ZERO);
+    }
+
+    private BigDecimal computePlatformFee(BigDecimal amount) {
+        BigDecimal pct = amount.multiply(platformFeePercentage).divide(new BigDecimal("100"), 2, RoundingMode.HALF_UP);
+        return pct.add(platformFixedFee).max(BigDecimal.ZERO);
     }
 
     private boolean verifyTransactionWithPaystack(String reference, long expectedAmountKobo) {

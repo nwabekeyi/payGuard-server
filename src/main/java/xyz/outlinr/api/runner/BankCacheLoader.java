@@ -1,11 +1,11 @@
-package xyz.outlinr.api.runner;
+package com.payguard.api.runner;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
-import xyz.outlinr.api.service.BankService;
+import com.payguard.api.service.BankService;
 
 @Component
 @RequiredArgsConstructor

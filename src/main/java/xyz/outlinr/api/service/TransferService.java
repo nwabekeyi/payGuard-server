@@ -1,4 +1,4 @@
-package xyz.outlinr.api.service;
+package com.payguard.api.service;
 
 import java.math.BigDecimal;
 

@@ -1,4 +1,4 @@
-package xyz.outlinr.api.dto.request;
+package com.payguard.api.dto.request;
 
 public record LoginRequest(
         String email,

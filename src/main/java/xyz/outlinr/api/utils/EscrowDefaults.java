@@ -1,4 +1,4 @@
-package xyz.outlinr.api.utils;
+package com.payguard.api.utils;
 
 public final class EscrowDefaults {
 

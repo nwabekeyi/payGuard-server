@@ -1,4 +1,4 @@
-package xyz.outlinr.api.dto.request;
+package com.payguard.api.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;

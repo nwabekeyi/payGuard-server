@@ -1,4 +1,4 @@
-package xyz.outlinr.api.service.impl;
+package com.payguard.api.service.impl;
 
 import com.resend.Resend;
 import com.resend.core.exception.ResendException;
@@ -11,12 +11,12 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
-import xyz.outlinr.api.config.ResendConfig;
-import xyz.outlinr.api.entity.Escrow;
-import xyz.outlinr.api.entity.EscrowParticipant;
-import xyz.outlinr.api.entity.User;
-import xyz.outlinr.api.entity.enumeration.ParticipantRole;
-import xyz.outlinr.api.service.EmailService;
+import com.payguard.api.config.ResendConfig;
+import com.payguard.api.entity.Escrow;
+import com.payguard.api.entity.EscrowParticipant;
+import com.payguard.api.entity.User;
+import com.payguard.api.entity.enumeration.ParticipantRole;
+import com.payguard.api.service.EmailService;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;

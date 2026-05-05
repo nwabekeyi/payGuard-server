@@ -1,7 +1,7 @@
-package xyz.outlinr.api.dto.response;
+package com.payguard.api.dto.response;
 
-import xyz.outlinr.api.entity.enumeration.DisputeResolution;
-import xyz.outlinr.api.entity.enumeration.DisputeStatus;
+import com.payguard.api.entity.enumeration.DisputeResolution;
+import com.payguard.api.entity.enumeration.DisputeStatus;
 
 import java.time.Instant;
 import java.util.List;
