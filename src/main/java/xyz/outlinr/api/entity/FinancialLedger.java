@@ -1,12 +1,12 @@
-package xyz.outlinr.api.entity;
+package com.payguard.api.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import xyz.outlinr.api.entity.enumeration.LedgerStatus;
-import org.hibernate.annotations.UuidGenerator;
+import com.payguard.api.entity.enumeration.LedgerStatus;
+import org.hibernate.annotations.GenericGenerator;
 
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -21,8 +21,8 @@ import java.util.UUID;
 public class FinancialLedger {
 
     @Id
-    @UuidGenerator(style = "UNIX_EPOCH")
-    @GeneratedValue
+    @GeneratedValue(generator = "uuid7")
+    @GenericGenerator(name = "uuid7", type = com.payguard.api.utils.UUIDv7IdentifierGenerator.class)
     private UUID id;
 
     @OneToOne(fetch = FetchType.LAZY)
@@ -31,6 +31,15 @@ public class FinancialLedger {
 
     @Column(nullable = false)
     private BigDecimal amount;
+    @Column(name = "paystack_fee", nullable = false)
+    @Builder.Default
+    private BigDecimal paystackFee = BigDecimal.ZERO;
+    @Column(name = "platform_fee", nullable = false)
+    @Builder.Default
+    private BigDecimal platformFee = BigDecimal.ZERO;
+    @Column(name = "net_payout_amount", nullable = false)
+    @Builder.Default
+    private BigDecimal netPayoutAmount = BigDecimal.ZERO;
 
     @Column(nullable = false)
     private String currency;

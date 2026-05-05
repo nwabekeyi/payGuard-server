@@ -1,13 +1,13 @@
-package xyz.outlinr.api.entity;
+package com.payguard.api.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import xyz.outlinr.api.entity.enumeration.*;
-import xyz.outlinr.api.utils.EscrowDefaults;
-import org.hibernate.annotations.UuidGenerator;
+import com.payguard.api.entity.enumeration.*;
+import com.payguard.api.utils.EscrowDefaults;
+import org.hibernate.annotations.GenericGenerator;
 
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -24,8 +24,8 @@ import java.util.UUID;
 public class Escrow {
 
     @Id
-    @UuidGenerator(style = "UNIX_EPOCH")
-    @GeneratedValue
+    @GeneratedValue(generator = "uuid7")
+    @GenericGenerator(name = "uuid7", type = com.payguard.api.utils.UUIDv7IdentifierGenerator.class)
     private UUID id;
 
     @Column(nullable = false)

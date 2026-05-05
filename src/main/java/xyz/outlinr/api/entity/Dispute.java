@@ -1,11 +1,11 @@
-package xyz.outlinr.api.entity;
+package com.payguard.api.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.UuidGenerator;
+import org.hibernate.annotations.GenericGenerator;
 
-import xyz.outlinr.api.entity.enumeration.DisputeResolution;
-import xyz.outlinr.api.entity.enumeration.DisputeStatus;
+import com.payguard.api.entity.enumeration.DisputeResolution;
+import com.payguard.api.entity.enumeration.DisputeStatus;
 
 import java.time.Instant;
 import java.util.ArrayList;
@@ -21,8 +21,8 @@ import java.util.UUID;
 @AllArgsConstructor
 public class Dispute {
     @Id
-    @UuidGenerator(style = "UNIX_EPOCH")
-    @GeneratedValue
+    @GeneratedValue(generator = "uuid7")
+    @GenericGenerator(name = "uuid7", type = com.payguard.api.utils.UUIDv7IdentifierGenerator.class)
     @Column(updatable = false, nullable = false)
     private UUID id;
 

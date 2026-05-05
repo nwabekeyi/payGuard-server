@@ -1,11 +1,11 @@
-package xyz.outlinr.api.controller;
+package com.payguard.api.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import xyz.outlinr.api.model.AccountDetail;
-import xyz.outlinr.api.model.Bank;
-import xyz.outlinr.api.service.BankService;
+import com.payguard.api.model.AccountDetail;
+import com.payguard.api.model.Bank;
+import com.payguard.api.service.BankService;
 
 import java.util.List;
 

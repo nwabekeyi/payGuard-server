@@ -1,10 +1,10 @@
-package xyz.outlinr.api.service;
+package com.payguard.api.service;
 
-import xyz.outlinr.api.dto.request.CreateEscrowRequest;
-import xyz.outlinr.api.dto.request.VerifyAndCreateEscrowRequest;
-import xyz.outlinr.api.dto.response.InitPaymentResponse;
-import xyz.outlinr.api.dto.response.VerifyPaymentResponse;
-import xyz.outlinr.api.entity.User;
+import com.payguard.api.dto.request.CreateEscrowRequest;
+import com.payguard.api.dto.request.VerifyAndCreateEscrowRequest;
+import com.payguard.api.dto.response.InitPaymentResponse;
+import com.payguard.api.dto.response.VerifyPaymentResponse;
+import com.payguard.api.entity.User;
 
 import java.util.UUID;
 

@@ -1,4 +1,4 @@
-package xyz.outlinr.api.utils;
+package com.payguard.api.utils;
 
 import java.util.UUID;
 import java.time.Instant;

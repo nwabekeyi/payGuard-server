@@ -1,4 +1,4 @@
-package xyz.outlinr.api.controller;
+package com.payguard.api.controller;
 
 import jakarta.validation.Valid;
 import jakarta.servlet.http.HttpServletRequest;
@@ -9,11 +9,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import xyz.outlinr.api.dto.request.*;
-import xyz.outlinr.api.dto.response.*;
-import xyz.outlinr.api.entity.User;
-import xyz.outlinr.api.security.CookieService;
-import xyz.outlinr.api.service.AuthService;
+import com.payguard.api.dto.request.*;
+import com.payguard.api.dto.response.*;
+import com.payguard.api.entity.User;
+import com.payguard.api.security.CookieService;
+import com.payguard.api.service.AuthService;
 
 import java.util.Map;
 

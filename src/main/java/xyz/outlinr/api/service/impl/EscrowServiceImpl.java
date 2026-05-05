@@ -1,23 +1,23 @@
-package xyz.outlinr.api.service.impl;
+package com.payguard.api.service.impl;
 
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import xyz.outlinr.api.dto.request.*;
-import xyz.outlinr.api.dto.response.*;
-import xyz.outlinr.api.entity.*;
-import xyz.outlinr.api.entity.enumeration.*;
-import xyz.outlinr.api.exception.IllegalStateTransitionException;
-import xyz.outlinr.api.repository.EscrowParticipantRepository;
-import xyz.outlinr.api.repository.EscrowRepository;
-import xyz.outlinr.api.repository.FinancialLedgerRepository;
-import xyz.outlinr.api.repository.PayoutTransactionRepository;
-import xyz.outlinr.api.repository.UserRepository;
-import xyz.outlinr.api.service.EscrowService;
-import xyz.outlinr.api.service.TransferService;
-import xyz.outlinr.api.service.EmailService;
-import xyz.outlinr.api.security.JwtService;
+import com.payguard.api.dto.request.*;
+import com.payguard.api.dto.response.*;
+import com.payguard.api.entity.*;
+import com.payguard.api.entity.enumeration.*;
+import com.payguard.api.exception.IllegalStateTransitionException;
+import com.payguard.api.repository.EscrowParticipantRepository;
+import com.payguard.api.repository.EscrowRepository;
+import com.payguard.api.repository.FinancialLedgerRepository;
+import com.payguard.api.repository.PayoutTransactionRepository;
+import com.payguard.api.repository.UserRepository;
+import com.payguard.api.service.EscrowService;
+import com.payguard.api.service.TransferService;
+import com.payguard.api.service.EmailService;
+import com.payguard.api.security.JwtService;
 
 import java.time.Instant;
 import java.util.*;
@@ -110,11 +110,11 @@ public class EscrowServiceImpl implements EscrowService {
 
     private EscrowResponse createEscrow(CreateEscrowRequest request, User creator, EscrowStatus forcedStatus) {
         // Validate amount bounds
-        java.math.BigDecimal minAmount = java.math.BigDecimal.valueOf(xyz.outlinr.api.utils.EscrowDefaults.AMOUNT_MIN);
-        java.math.BigDecimal maxAmount = java.math.BigDecimal.valueOf(xyz.outlinr.api.utils.EscrowDefaults.AMOUNT_MAX);
+        java.math.BigDecimal minAmount = java.math.BigDecimal.valueOf(com.payguard.api.utils.EscrowDefaults.AMOUNT_MIN);
+        java.math.BigDecimal maxAmount = java.math.BigDecimal.valueOf(com.payguard.api.utils.EscrowDefaults.AMOUNT_MAX);
         if (request.amount().compareTo(minAmount) < 0 || request.amount().compareTo(maxAmount) > 0) {
             throw new IllegalArgumentException(
-                    "Amount must be between " + xyz.outlinr.api.utils.EscrowDefaults.AMOUNT_MIN + " and " + xyz.outlinr.api.utils.EscrowDefaults.AMOUNT_MAX);
+                    "Amount must be between " + com.payguard.api.utils.EscrowDefaults.AMOUNT_MIN + " and " + com.payguard.api.utils.EscrowDefaults.AMOUNT_MAX);
         }
 
         // Validate counterparty is not creator
@@ -133,18 +133,18 @@ public class EscrowServiceImpl implements EscrowService {
                 .title(request.title())
                 .description(request.description())
                 .amount(request.amount())
-                .currency(request.currency() != null ? request.currency() : xyz.outlinr.api.utils.EscrowDefaults.DEFAULT_CURRENCY)
+                .currency(request.currency() != null ? request.currency() : com.payguard.api.utils.EscrowDefaults.DEFAULT_CURRENCY)
                 .participationMode(request.participationMode())
                 .deliveryType(request.deliveryType())
                 .inspectionPeriodDays(request.inspectionPeriodDays() != null ? request.inspectionPeriodDays()
-                        : xyz.outlinr.api.utils.EscrowDefaults.INSPECTION_PERIOD_DAYS)
-                .autoRelease(request.autoRelease() != null ? request.autoRelease() : xyz.outlinr.api.utils.EscrowDefaults.AUTO_RELEASE)
+                        : com.payguard.api.utils.EscrowDefaults.INSPECTION_PERIOD_DAYS)
+                .autoRelease(request.autoRelease() != null ? request.autoRelease() : com.payguard.api.utils.EscrowDefaults.AUTO_RELEASE)
                 .disputeWindowHours(request.disputeWindowHours() != null ? request.disputeWindowHours()
-                        : xyz.outlinr.api.utils.EscrowDefaults.DISPUTE_WINDOW_HOURS)
+                        : com.payguard.api.utils.EscrowDefaults.DISPUTE_WINDOW_HOURS)
                 .requireProofOfDelivery(request.requireProofOfDelivery() != null ? request.requireProofOfDelivery()
-                        : xyz.outlinr.api.utils.EscrowDefaults.REQUIRE_PROOF_OF_DELIVERY)
+                        : com.payguard.api.utils.EscrowDefaults.REQUIRE_PROOF_OF_DELIVERY)
                 .milestoneEnabled(request.milestoneEnabled() != null ? request.milestoneEnabled()
-                        : xyz.outlinr.api.utils.EscrowDefaults.MILESTONE_ENABLED)
+                        : com.payguard.api.utils.EscrowDefaults.MILESTONE_ENABLED)
                 .customDeliveryNotes(request.customDeliveryNotes())
                 .shippingResponsibility(request.shippingResponsibility())
                 .expectedDeliveryDays(request.expectedDeliveryDays())
@@ -380,7 +380,7 @@ public class EscrowServiceImpl implements EscrowService {
             User newUser = User.builder()
                 .email(participant.getEmail())
                 .name(participant.getName() != null ? participant.getName() : "Invited User")
-                .password(passwordEncoder.encode(UUID.randomUUID().toString())) // Random temporary password
+                .password(passwordEncoder.encode(com.payguard.api.utils.UUIDv7Generator.generate().toString())) // Random temporary password
                 .accountStatus(AccountStatus.PENDING_SETUP)
                 .userTier(UserTier.PARTIAL) // Invite-created ghost accounts are PARTIAL
                 .build();
@@ -504,10 +504,13 @@ public class EscrowServiceImpl implements EscrowService {
         String txnRef = "PO-" + escrow.getId().toString().substring(0, 8) + "-" + System.currentTimeMillis();
         ledger.setPayoutReference(txnRef);
 
+        BigDecimal payoutAmount = ledger.getNetPayoutAmount() != null && ledger.getNetPayoutAmount().compareTo(BigDecimal.ZERO) > 0
+                ? ledger.getNetPayoutAmount() : escrow.getAmount();
+
         PayoutTransaction transaction = PayoutTransaction.builder()
                 .escrow(escrow)
                 .recipient(seller)
-                .amount(escrow.getAmount())
+                .amount(payoutAmount)
                 .currency(escrow.getCurrency())
                 .bankAccountNumber(accountNumber)
                 .bankCode(bankCode)
@@ -519,7 +522,7 @@ public class EscrowServiceImpl implements EscrowService {
 
         try {
             boolean success = transferService.initiateTransfer(
-                escrow.getAmount(),
+                payoutAmount,
                 "Escrow Payout for: " + escrow.getTitle(),
                 accountNumber,
                 bankCode,

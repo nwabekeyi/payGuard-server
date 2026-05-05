@@ -1,12 +1,12 @@
-package xyz.outlinr.api.entity;
+package com.payguard.api.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import xyz.outlinr.api.entity.enumeration.ParticipantRole;
-import org.hibernate.annotations.UuidGenerator;
+import com.payguard.api.entity.enumeration.ParticipantRole;
+import org.hibernate.annotations.GenericGenerator;
 
 import java.time.Instant;
 import java.util.UUID;
@@ -20,8 +20,8 @@ import java.util.UUID;
 public class EscrowParticipant {
 
     @Id
-    @UuidGenerator(style = "UNIX_EPOCH")
-    @GeneratedValue
+    @GeneratedValue(generator = "uuid7")
+    @GenericGenerator(name = "uuid7", type = com.payguard.api.utils.UUIDv7IdentifierGenerator.class)
     private UUID id;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -43,7 +43,7 @@ public class EscrowParticipant {
 
     @Column(nullable = false, unique = true)
     @Builder.Default
-    private UUID inviteToken = UUID.randomUUID();
+    private UUID inviteToken = com.payguard.api.utils.UUIDv7Generator.generate();
 
     @Column(nullable = false)
     @Builder.Default

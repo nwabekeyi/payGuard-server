@@ -1,10 +1,10 @@
-package xyz.outlinr.api.dto.response;
+package com.payguard.api.dto.response;
 
-import xyz.outlinr.api.entity.enumeration.ConfirmationMethod;
-import xyz.outlinr.api.entity.enumeration.DeliveryType;
-import xyz.outlinr.api.entity.enumeration.EscrowStatus;
-import xyz.outlinr.api.entity.enumeration.ParticipationMode;
-import xyz.outlinr.api.entity.enumeration.ShippingResponsibility;
+import com.payguard.api.entity.enumeration.ConfirmationMethod;
+import com.payguard.api.entity.enumeration.DeliveryType;
+import com.payguard.api.entity.enumeration.EscrowStatus;
+import com.payguard.api.entity.enumeration.ParticipationMode;
+import com.payguard.api.entity.enumeration.ShippingResponsibility;
 
 import java.math.BigDecimal;
 import java.time.Instant;
