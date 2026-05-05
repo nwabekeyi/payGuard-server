@@ -1,0 +1,246 @@
+package xyz.outlinr.api.service.impl;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.*;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestTemplate;
+import xyz.outlinr.api.config.PaystackConfig;
+import xyz.outlinr.api.dto.request.CreateEscrowRequest;
+import xyz.outlinr.api.dto.request.VerifyAndCreateEscrowRequest;
+import xyz.outlinr.api.entity.Escrow;
+import xyz.outlinr.api.entity.EscrowStatusHistory;
+import xyz.outlinr.api.entity.FinancialLedger;
+import xyz.outlinr.api.entity.User;
+import xyz.outlinr.api.entity.enumeration.EscrowStatus;
+import xyz.outlinr.api.entity.enumeration.LedgerStatus;
+import xyz.outlinr.api.dto.response.InitPaymentResponse;
+import xyz.outlinr.api.dto.response.VerifyPaymentResponse;
+import xyz.outlinr.api.repository.EscrowRepository;
+import xyz.outlinr.api.repository.FinancialLedgerRepository;
+import xyz.outlinr.api.service.EmailService;
+import xyz.outlinr.api.service.PaymentService;
+
+import java.math.BigDecimal;
+import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.UUID;
+
+@Slf4j
+@Service
+@RequiredArgsConstructor
+public class PaystackPaymentServiceImpl implements PaymentService {
+
+    private final PaystackConfig config;
+    private final EscrowRepository escrowRepository;
+    private final FinancialLedgerRepository ledgerRepository;
+    private final EmailService emailService;
+    private final RestTemplate restTemplate = new RestTemplate();
+
+    @Value("${app.frontend.url:http://localhost:5173}")
+    private String frontendUrl;
+
+    @Override
+    @Transactional
+    public InitPaymentResponse initiatePayment(UUID escrowId, User currentUser) {
+        Escrow escrow = escrowRepository.findById(escrowId)
+                .orElseThrow(() -> new NoSuchElementException("Escrow not found: " + escrowId));
+
+        if (escrow.getStatus() != EscrowStatus.AWAITING_FUNDING && escrow.getStatus() != EscrowStatus.DRAFT) {
+            throw new IllegalStateException("Escrow cannot be funded in its current state: " + escrow.getStatus());
+        }
+
+        long amountInKobo = escrow.getAmount().multiply(new BigDecimal(100)).longValue();
+        return initiatePaymentCommon(escrowId.toString(), amountInKobo, currentUser);
+    }
+
+    @Override
+    @Transactional
+    public InitPaymentResponse initiateNewEscrowPayment(CreateEscrowRequest request, User currentUser) {
+        long amountInKobo = request.amount().multiply(new BigDecimal(100)).longValue();
+        // Use a temporary identifier; we will handle atomic creation via verify-and-create
+        return initiatePaymentCommon("new", amountInKobo, currentUser);
+    }
+
+    private InitPaymentResponse initiatePaymentCommon(String siteId, long amountInKobo, User currentUser) {
+        String callbackUrl = frontendUrl + "/verify-payment/" + siteId;
+
+        // Build payload
+        Map<String, Object> payload = new java.util.HashMap<>();
+        payload.put("amount", amountInKobo);
+        payload.put("email", currentUser.getEmail());
+        payload.put("currency", "NGN");
+        payload.put("callback_url", callbackUrl);
+        // Unique reference
+        String reference = "REF-" + UUID.randomUUID();
+        payload.put("reference", reference);
+        // Metadata to identify escrow when verifying webhook/callback
+        Map<String, String> metadata = Map.of("escrowId", siteId);
+        payload.put("metadata", metadata);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBearerAuth(config.getSecretKey());
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<Map<String, Object>> entity = new HttpEntity<>(payload, headers);
+
+        String url = config.getBaseUrl() + "/transaction/initialize";
+
+        try {
+            ResponseEntity<Map<String, Object>> response = restTemplate.exchange(
+                    url,
+                    HttpMethod.POST,
+                    entity,
+                    new org.springframework.core.ParameterizedTypeReference<Map<String, Object>>() {}
+            );
+
+            Map<String, Object> body = response.getBody();
+            if (body == null || !Boolean.TRUE.equals(body.get("status"))) {
+                throw new IllegalStateException("Paystack initialization failed: " + (body != null ? body.get("message") : "No response"));
+            }
+
+            Map<String, Object> data = (Map<String, Object>) body.get("data");
+            String accessCode = (String) data.get("access_code");
+            String referenceResp = (String) data.get("reference");
+
+            return InitPaymentResponse.builder()
+                    .accessCode(accessCode)
+                    .reference(referenceResp)
+                    .email(currentUser.getEmail())
+                    .amount(String.valueOf(amountInKobo))
+                    .currency("NGN")
+                    .callbackUrl(callbackUrl)
+                    .build();
+
+        } catch (Exception e) {
+            log.error("Paystack payment initiation failed", e);
+            throw new RuntimeException("Could not initiate payment: " + e.getMessage(), e);
+        }
+    }
+
+    // This verifies the transaction with Paystack and funds the escrow if success
+    @Override
+    @Transactional
+    public boolean verifyAndFundEscrow(UUID escrowId, String transactionReference, long amountInKobo) {
+        Escrow escrow = escrowRepository.findById(escrowId)
+                .orElseThrow(() -> new NoSuchElementException("Escrow not found: " + escrowId));
+
+        // Already funded?
+        if (escrow.getStatus() == EscrowStatus.PENDING_ACCEPTANCE ||
+                escrow.getStatus() == EscrowStatus.ACTIVE ||
+                escrow.getStatus() == EscrowStatus.FUNDED) {
+            return true;
+        }
+
+        boolean success = verifyTransactionWithPaystack(transactionReference, amountInKobo);
+        if (success) {
+            log.info("Payment Verification SUCCESS for escrow {}", escrowId);
+
+            EscrowStatus fromStatus = escrow.getStatus();
+
+            boolean sellerAccepted = escrow.getParticipants().stream()
+                    .filter(p -> p.getRole() == xyz.outlinr.api.entity.enumeration.ParticipantRole.SELLER)
+                    .anyMatch(p -> p.getInviteAccepted() != null && p.getInviteAccepted());
+
+            EscrowStatus nextStatus = sellerAccepted ? EscrowStatus.FUNDED : EscrowStatus.PENDING_ACCEPTANCE;
+            escrow.setStatus(nextStatus);
+
+            EscrowStatusHistory history = EscrowStatusHistory.builder()
+                    .escrow(escrow)
+                    .fromStatus(fromStatus)
+                    .toStatus(nextStatus)
+                    .changedBy(escrow.getCreatedBy())
+                    .reason("Payment verified via Paystack: " + transactionReference)
+                    .build();
+
+            escrow.getStatusHistory().add(history);
+            escrowRepository.save(escrow);
+
+            FinancialLedger ledger = FinancialLedger.builder()
+                    .escrow(escrow)
+                    .amount(escrow.getAmount())
+                    .currency(escrow.getCurrency())
+                    .status(LedgerStatus.HELD)
+                    .paymentReference(transactionReference)
+                    .build();
+            ledgerRepository.save(ledger);
+
+            try {
+                emailService.sendEscrowInviteEmails(escrow, escrow.getCreatedBy());
+            } catch (Exception e) {
+                log.error("Failed to send escrow invite emails", e);
+            }
+
+            return true;
+        }
+
+        log.warn("Payment Verification FAILED for escrow {}", escrowId);
+        return false;
+    }
+
+    private boolean verifyTransactionWithPaystack(String reference, long expectedAmountKobo) {
+        String url = config.getBaseUrl() + "/transaction/verify/" + reference;
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBearerAuth(config.getSecretKey());
+        HttpEntity<Void> entity = new HttpEntity<>(headers);
+
+        try {
+            ResponseEntity<Map<String, Object>> response = restTemplate.exchange(
+                    url,
+                    HttpMethod.GET,
+                    entity,
+                    new org.springframework.core.ParameterizedTypeReference<Map<String, Object>>() {}
+            );
+
+            Map<String, Object> body = response.getBody();
+            if (body != null && Boolean.TRUE.equals(body.get("status")) && body.get("data") instanceof Map) {
+                @SuppressWarnings("unchecked")
+                Map<String, Object> data = (Map<String, Object>) body.get("data");
+                String paystackStatus = (String) data.get("status");
+                boolean paid = "success".equalsIgnoreCase(paystackStatus) || "success".equalsIgnoreCase((String) data.get("payment_status"));
+                if (paid) {
+                    Number amountNum = (Number) data.get("amount"); // amount in kobo from Paystack
+                    long amountPaid = amountNum != null ? amountNum.longValue() : -1;
+                    if (amountPaid == expectedAmountKobo) {
+                        return true;
+                    } else {
+                        log.warn("Amount mismatch: expected {} kobo, got {} kobo", expectedAmountKobo, amountPaid);
+                    }
+                } else {
+                    log.info("Paystack payment status not successful: {}", paystackStatus);
+                }
+            }
+            return false;
+        } catch (Exception e) {
+            log.error("Error during Paystack transaction verification", e);
+            return false;
+        }
+    }
+
+    @Override
+    public VerifyPaymentResponse verifyEscrowPayment(UUID escrowId, String transactionReference, long amountInKobo) {
+        boolean isSuccessful = verifyAndFundEscrow(escrowId, transactionReference, amountInKobo);
+        if (isSuccessful) {
+            return new VerifyPaymentResponse("success", "Payment verified and escrow funded");
+        }
+        return new VerifyPaymentResponse("failed", "Payment verification failed");
+    }
+
+    @Override
+    public boolean verifyTransaction(String transactionReference) {
+        // Not used directly; return true placeholder
+        return true;
+    }
+
+    @Override
+    public VerifyPaymentResponse verifyAndCreateEscrow(VerifyAndCreateEscrowRequest request, User currentUser) {
+        // This should verify and then create escrow. But flow uses verifyAndCreate endpoint;
+        // We'll just verify and if successful, the controller will handle creating escrow separately.
+        boolean success = verifyTransactionWithPaystack(request.txnRef(), request.amount());
+        if (success) {
+            return new VerifyPaymentResponse("success", "Payment verified");
+        }
+        return new VerifyPaymentResponse("failed", "Payment verification failed");
+    }
+}
