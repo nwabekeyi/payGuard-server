@@ -1,4 +1,4 @@
-package xyz.outlinr.api.security;
+package com.payguard.security;
 
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;

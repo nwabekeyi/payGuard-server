@@ -1,4 +1,4 @@
-package xyz.outlinr.api.config;
+package com.payguard.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

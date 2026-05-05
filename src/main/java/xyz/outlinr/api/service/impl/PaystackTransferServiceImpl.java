@@ -1,14 +1,14 @@
-package xyz.outlinr.api.service.impl;
+package com.payguard.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
-import xyz.outlinr.api.config.PaystackConfig;
-import xyz.outlinr.api.model.AccountDetail;
-import xyz.outlinr.api.service.BankService;
-import xyz.outlinr.api.service.TransferService;
+import com.payguard.config.PaystackConfig;
+import com.payguard.model.AccountDetail;
+import com.payguard.service.BankService;
+import com.payguard.service.TransferService;
 
 import java.math.BigDecimal;
 import java.util.Base64;

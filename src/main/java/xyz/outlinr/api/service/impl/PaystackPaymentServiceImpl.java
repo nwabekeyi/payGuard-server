@@ -1,27 +1,28 @@
-package xyz.outlinr.api.service.impl;
+package com.payguard.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
-import xyz.outlinr.api.config.PaystackConfig;
-import xyz.outlinr.api.dto.request.CreateEscrowRequest;
-import xyz.outlinr.api.dto.request.VerifyAndCreateEscrowRequest;
-import xyz.outlinr.api.entity.Escrow;
-import xyz.outlinr.api.entity.EscrowStatusHistory;
-import xyz.outlinr.api.entity.FinancialLedger;
-import xyz.outlinr.api.entity.User;
-import xyz.outlinr.api.entity.enumeration.EscrowStatus;
-import xyz.outlinr.api.entity.enumeration.LedgerStatus;
-import xyz.outlinr.api.dto.response.InitPaymentResponse;
-import xyz.outlinr.api.dto.response.VerifyPaymentResponse;
-import xyz.outlinr.api.repository.EscrowRepository;
-import xyz.outlinr.api.repository.FinancialLedgerRepository;
-import xyz.outlinr.api.service.EmailService;
-import xyz.outlinr.api.service.PaymentService;
+import com.payguard.config.PaystackConfig;
+import com.payguard.dto.request.CreateEscrowRequest;
+import com.payguard.dto.request.VerifyAndCreateEscrowRequest;
+import com.payguard.entity.Escrow;
+import com.payguard.entity.EscrowStatusHistory;
+import com.payguard.entity.FinancialLedger;
+import com.payguard.entity.User;
+import com.payguard.entity.enumeration.EscrowStatus;
+import com.payguard.entity.enumeration.LedgerStatus;
+import com.payguard.dto.response.InitPaymentResponse;
+import com.payguard.dto.response.VerifyPaymentResponse;
+import com.payguard.repository.EscrowRepository;
+import com.payguard.repository.FinancialLedgerRepository;
+import com.payguard.service.EmailService;
+import com.payguard.service.PaymentService;
 
 import java.math.BigDecimal;
 import java.util.Map;
@@ -37,6 +38,7 @@ public class PaystackPaymentServiceImpl implements PaymentService {
     private final EscrowRepository escrowRepository;
     private final FinancialLedgerRepository ledgerRepository;
     private final EmailService emailService;
+    private final RedisTemplate<String, Object> redisTemplate;
     private final RestTemplate restTemplate = new RestTemplate();
 
     @Value("${app.frontend.url:http://localhost:5173}")
@@ -123,7 +125,14 @@ public class PaystackPaymentServiceImpl implements PaymentService {
     @Override
     @Transactional
     public boolean verifyAndFundEscrow(UUID escrowId, String transactionReference, long amountInKobo) {
-        Escrow escrow = escrowRepository.findById(escrowId)
+        String idempotencyKey = "payment:verify:" + transactionReference;
+        Boolean first = redisTemplate.opsForValue().setIfAbsent(idempotencyKey, "PROCESSING", java.time.Duration.ofMinutes(30));
+        if (Boolean.FALSE.equals(first)) {
+            log.info("Skipping duplicate verify request for reference {}", transactionReference);
+            return true;
+        }
+
+        Escrow escrow = escrowRepository.findByIdForUpdate(escrowId)
                 .orElseThrow(() -> new NoSuchElementException("Escrow not found: " + escrowId));
 
         // Already funded?
@@ -140,7 +149,7 @@ public class PaystackPaymentServiceImpl implements PaymentService {
             EscrowStatus fromStatus = escrow.getStatus();
 
             boolean sellerAccepted = escrow.getParticipants().stream()
-                    .filter(p -> p.getRole() == xyz.outlinr.api.entity.enumeration.ParticipantRole.SELLER)
+                    .filter(p -> p.getRole() == com.payguard.entity.enumeration.ParticipantRole.SELLER)
                     .anyMatch(p -> p.getInviteAccepted() != null && p.getInviteAccepted());
 
             EscrowStatus nextStatus = sellerAccepted ? EscrowStatus.FUNDED : EscrowStatus.PENDING_ACCEPTANCE;
@@ -157,14 +166,16 @@ public class PaystackPaymentServiceImpl implements PaymentService {
             escrow.getStatusHistory().add(history);
             escrowRepository.save(escrow);
 
-            FinancialLedger ledger = FinancialLedger.builder()
-                    .escrow(escrow)
-                    .amount(escrow.getAmount())
-                    .currency(escrow.getCurrency())
-                    .status(LedgerStatus.HELD)
-                    .paymentReference(transactionReference)
-                    .build();
-            ledgerRepository.save(ledger);
+            if (ledgerRepository.findByEscrow(escrow).isEmpty()) {
+                FinancialLedger ledger = FinancialLedger.builder()
+                        .escrow(escrow)
+                        .amount(escrow.getAmount())
+                        .currency(escrow.getCurrency())
+                        .status(LedgerStatus.HELD)
+                        .paymentReference(transactionReference)
+                        .build();
+                ledgerRepository.save(ledger);
+            }
 
             try {
                 emailService.sendEscrowInviteEmails(escrow, escrow.getCreatedBy());

@@ -1,4 +1,4 @@
-package xyz.outlinr.api.model;
+package com.payguard.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

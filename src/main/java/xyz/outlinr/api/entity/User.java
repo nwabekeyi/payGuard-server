@@ -1,4 +1,4 @@
-package xyz.outlinr.api.entity;
+package com.payguard.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -8,9 +8,9 @@ import lombok.NoArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import xyz.outlinr.api.entity.enumeration.AccountStatus;
-import xyz.outlinr.api.entity.enumeration.KycType;
-import xyz.outlinr.api.entity.enumeration.UserTier;
+import com.payguard.entity.enumeration.AccountStatus;
+import com.payguard.entity.enumeration.KycType;
+import com.payguard.entity.enumeration.UserTier;
 import org.hibernate.annotations.UuidGenerator;
 
 import java.time.Instant;
@@ -27,7 +27,7 @@ import java.util.UUID;
 public class User implements UserDetails {
 
     @Id
-    @UuidGenerator(style = "UNIX_EPOCH")
+    @UuidGenerator(style = UuidGenerator.Style.TIME)
     @GeneratedValue
     private UUID id;
 

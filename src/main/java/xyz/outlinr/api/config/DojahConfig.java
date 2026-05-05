@@ -1,4 +1,4 @@
-package xyz.outlinr.api.config;
+package com.payguard.config;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;

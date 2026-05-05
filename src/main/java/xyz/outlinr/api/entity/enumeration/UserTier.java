@@ -1,4 +1,4 @@
-package xyz.outlinr.api.entity.enumeration;
+package com.payguard.entity.enumeration;
 
 /**
  * Defines capability tiers for users on the platform.

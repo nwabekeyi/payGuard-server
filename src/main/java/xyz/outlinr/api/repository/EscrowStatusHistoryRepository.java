@@ -1,8 +1,8 @@
-package xyz.outlinr.api.repository;
+package com.payguard.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import xyz.outlinr.api.entity.Escrow;
-import xyz.outlinr.api.entity.EscrowStatusHistory;
+import com.payguard.entity.Escrow;
+import com.payguard.entity.EscrowStatusHistory;
 
 import java.util.List;
 import java.util.UUID;

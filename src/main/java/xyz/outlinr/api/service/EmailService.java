@@ -1,7 +1,7 @@
-package xyz.outlinr.api.service;
+package com.payguard.service;
 
-import xyz.outlinr.api.entity.Escrow;
-import xyz.outlinr.api.entity.User;
+import com.payguard.entity.Escrow;
+import com.payguard.entity.User;
 
 public interface EmailService {
     /**

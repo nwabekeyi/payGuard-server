@@ -1,4 +1,4 @@
-package xyz.outlinr.api.dto.response;
+package com.payguard.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

@@ -1,8 +1,8 @@
-package xyz.outlinr.api.service;
+package com.payguard.service;
 
-import xyz.outlinr.api.dto.request.IdentityVerificationRequest;
-import xyz.outlinr.api.dto.response.IdentityVerificationResponse;
-import xyz.outlinr.api.entity.User;
+import com.payguard.dto.request.IdentityVerificationRequest;
+import com.payguard.dto.response.IdentityVerificationResponse;
+import com.payguard.entity.User;
 
 public interface IdentityVerificationService {
     IdentityVerificationResponse verifyIdentity(IdentityVerificationRequest request, User currentUser);

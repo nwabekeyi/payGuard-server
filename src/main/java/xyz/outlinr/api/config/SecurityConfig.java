@@ -1,4 +1,4 @@
-package xyz.outlinr.api.config;
+package com.payguard.config;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -17,8 +17,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import xyz.outlinr.api.repository.UserRepository;
-import xyz.outlinr.api.security.JwtAuthenticationFilter;
+import com.payguard.repository.UserRepository;
+import com.payguard.security.JwtAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
@@ -39,6 +39,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/v1/").permitAll()
                         .requestMatchers("/api/v1/escrows/invite/preview").permitAll()
                         .requestMatchers("/api/v1/escrows/invite/accept").permitAll()
+                        .requestMatchers("/api/v1/payments/webhook/paystack").permitAll()
                         .anyRequest().authenticated())
                 .authenticationProvider(authenticationProvider())
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);

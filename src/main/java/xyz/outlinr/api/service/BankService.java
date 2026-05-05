@@ -1,8 +1,8 @@
-package xyz.outlinr.api.service;
+package com.payguard.service;
 
 import java.util.List;
 
 public interface BankService {
-    List<xyz.outlinr.api.model.Bank> getAllBanks();
-    xyz.outlinr.api.model.AccountDetail resolveAccount(String accountNumber, String bankCode);
+    List<com.payguard.model.Bank> getAllBanks();
+    com.payguard.model.AccountDetail resolveAccount(String accountNumber, String bankCode);
 }

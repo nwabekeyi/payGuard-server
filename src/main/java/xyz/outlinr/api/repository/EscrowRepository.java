@@ -1,14 +1,16 @@
-package xyz.outlinr.api.repository;
+package com.payguard.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import xyz.outlinr.api.entity.Escrow;
-import xyz.outlinr.api.entity.enumeration.EscrowStatus;
-import xyz.outlinr.api.entity.User;
+import com.payguard.entity.Escrow;
+import com.payguard.entity.enumeration.EscrowStatus;
+import com.payguard.entity.User;
 
 import java.util.List;
 import java.util.UUID;
+import jakarta.persistence.LockModeType;
 
 public interface EscrowRepository extends JpaRepository<Escrow, UUID> {
 
@@ -17,4 +19,10 @@ public interface EscrowRepository extends JpaRepository<Escrow, UUID> {
 
     @Query("SELECT DISTINCT e FROM Escrow e JOIN e.participants p WHERE p.user = :user AND e.status = :status")
     List<Escrow> findByParticipantUserAndStatus(@Param("user") User user, @Param("status") EscrowStatus status);
+
+    long countByStatus(EscrowStatus status);
+
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("SELECT e FROM Escrow e WHERE e.id = :id")
+    java.util.Optional<Escrow> findByIdForUpdate(@Param("id") UUID id);
 }

@@ -1,4 +1,4 @@
-package xyz.outlinr.api.service.impl;
+package com.payguard.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -7,10 +7,10 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
-import xyz.outlinr.api.config.PaystackConfig;
-import xyz.outlinr.api.model.AccountDetail;
-import xyz.outlinr.api.model.Bank;
-import xyz.outlinr.api.service.BankService;
+import com.payguard.config.PaystackConfig;
+import com.payguard.model.AccountDetail;
+import com.payguard.model.Bank;
+import com.payguard.service.BankService;
 
 import java.time.Duration;
 import java.util.List;

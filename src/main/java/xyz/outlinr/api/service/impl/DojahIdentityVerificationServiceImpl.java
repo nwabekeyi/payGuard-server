@@ -1,4 +1,4 @@
-package xyz.outlinr.api.service.impl;
+package com.payguard.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -6,15 +6,15 @@ import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
-import xyz.outlinr.api.config.DojahConfig;
-import xyz.outlinr.api.dto.request.IdentityVerificationRequest;
-import xyz.outlinr.api.dto.response.IdentityVerificationResponse;
-import xyz.outlinr.api.entity.User;
-import xyz.outlinr.api.entity.enumeration.KycType;
-import xyz.outlinr.api.model.AccountDetail;
-import xyz.outlinr.api.repository.UserRepository;
-import xyz.outlinr.api.service.BankService;
-import xyz.outlinr.api.service.IdentityVerificationService;
+import com.payguard.config.DojahConfig;
+import com.payguard.dto.request.IdentityVerificationRequest;
+import com.payguard.dto.response.IdentityVerificationResponse;
+import com.payguard.entity.User;
+import com.payguard.entity.enumeration.KycType;
+import com.payguard.model.AccountDetail;
+import com.payguard.repository.UserRepository;
+import com.payguard.service.BankService;
+import com.payguard.service.IdentityVerificationService;
 
 import java.util.Map;
 

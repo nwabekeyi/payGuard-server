@@ -1,4 +1,4 @@
-package xyz.outlinr.api.controller;
+package com.payguard.controller;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;

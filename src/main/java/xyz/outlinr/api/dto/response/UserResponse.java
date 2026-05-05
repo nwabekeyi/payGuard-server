@@ -1,6 +1,6 @@
-package xyz.outlinr.api.dto.response;
+package com.payguard.dto.response;
 
-import xyz.outlinr.api.entity.User;
+import com.payguard.entity.User;
 
 import java.util.UUID;
 

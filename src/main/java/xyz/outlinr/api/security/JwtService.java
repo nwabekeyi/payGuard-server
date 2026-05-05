@@ -1,4 +1,4 @@
-package xyz.outlinr.api.security;
+package com.payguard.security;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -7,7 +7,7 @@ import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
-import xyz.outlinr.api.entity.User;
+import com.payguard.entity.User;
 
 import javax.crypto.SecretKey;
 import java.util.Date;

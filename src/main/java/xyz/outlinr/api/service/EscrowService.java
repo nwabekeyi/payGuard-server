@@ -1,9 +1,9 @@
-package xyz.outlinr.api.service;
+package com.payguard.service;
 
-import xyz.outlinr.api.dto.request.*;
-import xyz.outlinr.api.dto.response.*;
-import xyz.outlinr.api.entity.User;
-import xyz.outlinr.api.entity.enumeration.EscrowStatus;
+import com.payguard.dto.request.*;
+import com.payguard.dto.response.*;
+import com.payguard.entity.User;
+import com.payguard.entity.enumeration.EscrowStatus;
 
 import java.util.List;
 import java.util.UUID;

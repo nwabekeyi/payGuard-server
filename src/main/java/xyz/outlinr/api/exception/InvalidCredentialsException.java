@@ -1,4 +1,4 @@
-package xyz.outlinr.api.exception;
+package com.payguard.exception;
 
 public class InvalidCredentialsException extends RuntimeException {
     public InvalidCredentialsException(String message) {

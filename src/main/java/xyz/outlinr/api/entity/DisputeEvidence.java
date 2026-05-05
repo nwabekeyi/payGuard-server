@@ -1,4 +1,4 @@
-package xyz.outlinr.api.entity;
+package com.payguard.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -16,7 +16,7 @@ import java.util.UUID;
 @AllArgsConstructor
 public class DisputeEvidence {
     @Id
-    @UuidGenerator(style = "UNIX_EPOCH")
+    @UuidGenerator(style = UuidGenerator.Style.TIME)
     @GeneratedValue
     @Column(updatable = false, nullable = false)
     private UUID id;

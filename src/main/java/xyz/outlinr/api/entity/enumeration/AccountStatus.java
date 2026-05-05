@@ -1,4 +1,4 @@
-package xyz.outlinr.api.entity.enumeration;
+package com.payguard.entity.enumeration;
 
 public enum AccountStatus {
     ACTIVE,

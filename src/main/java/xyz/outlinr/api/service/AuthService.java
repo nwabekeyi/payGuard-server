@@ -1,12 +1,12 @@
-package xyz.outlinr.api.service;
+package com.payguard.service;
 
-import xyz.outlinr.api.dto.response.AuthResult;
-import xyz.outlinr.api.dto.request.LoginRequest;
-import xyz.outlinr.api.dto.request.RegisterRequest;
-import xyz.outlinr.api.dto.request.AccountSetupRequest;
-import xyz.outlinr.api.dto.request.UpdateBankAccountRequest;
-import xyz.outlinr.api.dto.response.UserResponse;
-import xyz.outlinr.api.entity.User;
+import com.payguard.dto.response.AuthResult;
+import com.payguard.dto.request.LoginRequest;
+import com.payguard.dto.request.RegisterRequest;
+import com.payguard.dto.request.AccountSetupRequest;
+import com.payguard.dto.request.UpdateBankAccountRequest;
+import com.payguard.dto.response.UserResponse;
+import com.payguard.entity.User;
 
 public interface AuthService {
     AuthResult register(RegisterRequest request);

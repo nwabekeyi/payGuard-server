@@ -1,23 +1,23 @@
-package xyz.outlinr.api.service.impl;
+package com.payguard.service.impl;
 
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import xyz.outlinr.api.dto.request.*;
-import xyz.outlinr.api.dto.response.*;
-import xyz.outlinr.api.entity.*;
-import xyz.outlinr.api.entity.enumeration.*;
-import xyz.outlinr.api.exception.IllegalStateTransitionException;
-import xyz.outlinr.api.repository.EscrowParticipantRepository;
-import xyz.outlinr.api.repository.EscrowRepository;
-import xyz.outlinr.api.repository.FinancialLedgerRepository;
-import xyz.outlinr.api.repository.PayoutTransactionRepository;
-import xyz.outlinr.api.repository.UserRepository;
-import xyz.outlinr.api.service.EscrowService;
-import xyz.outlinr.api.service.TransferService;
-import xyz.outlinr.api.service.EmailService;
-import xyz.outlinr.api.security.JwtService;
+import com.payguard.dto.request.*;
+import com.payguard.dto.response.*;
+import com.payguard.entity.*;
+import com.payguard.entity.enumeration.*;
+import com.payguard.exception.IllegalStateTransitionException;
+import com.payguard.repository.EscrowParticipantRepository;
+import com.payguard.repository.EscrowRepository;
+import com.payguard.repository.FinancialLedgerRepository;
+import com.payguard.repository.PayoutTransactionRepository;
+import com.payguard.repository.UserRepository;
+import com.payguard.service.EscrowService;
+import com.payguard.service.TransferService;
+import com.payguard.service.EmailService;
+import com.payguard.security.JwtService;
 
 import java.time.Instant;
 import java.util.*;
@@ -110,11 +110,11 @@ public class EscrowServiceImpl implements EscrowService {
 
     private EscrowResponse createEscrow(CreateEscrowRequest request, User creator, EscrowStatus forcedStatus) {
         // Validate amount bounds
-        java.math.BigDecimal minAmount = java.math.BigDecimal.valueOf(xyz.outlinr.api.utils.EscrowDefaults.AMOUNT_MIN);
-        java.math.BigDecimal maxAmount = java.math.BigDecimal.valueOf(xyz.outlinr.api.utils.EscrowDefaults.AMOUNT_MAX);
+        java.math.BigDecimal minAmount = java.math.BigDecimal.valueOf(com.payguard.utils.EscrowDefaults.AMOUNT_MIN);
+        java.math.BigDecimal maxAmount = java.math.BigDecimal.valueOf(com.payguard.utils.EscrowDefaults.AMOUNT_MAX);
         if (request.amount().compareTo(minAmount) < 0 || request.amount().compareTo(maxAmount) > 0) {
             throw new IllegalArgumentException(
-                    "Amount must be between " + xyz.outlinr.api.utils.EscrowDefaults.AMOUNT_MIN + " and " + xyz.outlinr.api.utils.EscrowDefaults.AMOUNT_MAX);
+                    "Amount must be between " + com.payguard.utils.EscrowDefaults.AMOUNT_MIN + " and " + com.payguard.utils.EscrowDefaults.AMOUNT_MAX);
         }
 
         // Validate counterparty is not creator
@@ -133,18 +133,18 @@ public class EscrowServiceImpl implements EscrowService {
                 .title(request.title())
                 .description(request.description())
                 .amount(request.amount())
-                .currency(request.currency() != null ? request.currency() : xyz.outlinr.api.utils.EscrowDefaults.DEFAULT_CURRENCY)
+                .currency(request.currency() != null ? request.currency() : com.payguard.utils.EscrowDefaults.DEFAULT_CURRENCY)
                 .participationMode(request.participationMode())
                 .deliveryType(request.deliveryType())
                 .inspectionPeriodDays(request.inspectionPeriodDays() != null ? request.inspectionPeriodDays()
-                        : xyz.outlinr.api.utils.EscrowDefaults.INSPECTION_PERIOD_DAYS)
-                .autoRelease(request.autoRelease() != null ? request.autoRelease() : xyz.outlinr.api.utils.EscrowDefaults.AUTO_RELEASE)
+                        : com.payguard.utils.EscrowDefaults.INSPECTION_PERIOD_DAYS)
+                .autoRelease(request.autoRelease() != null ? request.autoRelease() : com.payguard.utils.EscrowDefaults.AUTO_RELEASE)
                 .disputeWindowHours(request.disputeWindowHours() != null ? request.disputeWindowHours()
-                        : xyz.outlinr.api.utils.EscrowDefaults.DISPUTE_WINDOW_HOURS)
+                        : com.payguard.utils.EscrowDefaults.DISPUTE_WINDOW_HOURS)
                 .requireProofOfDelivery(request.requireProofOfDelivery() != null ? request.requireProofOfDelivery()
-                        : xyz.outlinr.api.utils.EscrowDefaults.REQUIRE_PROOF_OF_DELIVERY)
+                        : com.payguard.utils.EscrowDefaults.REQUIRE_PROOF_OF_DELIVERY)
                 .milestoneEnabled(request.milestoneEnabled() != null ? request.milestoneEnabled()
-                        : xyz.outlinr.api.utils.EscrowDefaults.MILESTONE_ENABLED)
+                        : com.payguard.utils.EscrowDefaults.MILESTONE_ENABLED)
                 .customDeliveryNotes(request.customDeliveryNotes())
                 .shippingResponsibility(request.shippingResponsibility())
                 .expectedDeliveryDays(request.expectedDeliveryDays())

@@ -1,4 +1,4 @@
-package xyz.outlinr.api.controller;
+package com.payguard.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -6,12 +6,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-import xyz.outlinr.api.dto.request.CreateEscrowRequest;
-import xyz.outlinr.api.entity.User;
-import xyz.outlinr.api.service.PaymentService;
-import xyz.outlinr.api.dto.request.VerifyPaymentRequest;
-import xyz.outlinr.api.dto.response.InitPaymentResponse;
-import xyz.outlinr.api.dto.response.VerifyPaymentResponse;
+import com.payguard.dto.request.CreateEscrowRequest;
+import com.payguard.entity.User;
+import com.payguard.service.PaymentService;
+import com.payguard.dto.request.VerifyPaymentRequest;
+import com.payguard.dto.response.InitPaymentResponse;
+import com.payguard.dto.response.VerifyPaymentResponse;
 
 import java.util.UUID;
 

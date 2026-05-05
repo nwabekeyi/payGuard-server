@@ -1,11 +1,11 @@
-package xyz.outlinr.api.entity;
+package com.payguard.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import xyz.outlinr.api.entity.enumeration.PayoutStatus;
+import com.payguard.entity.enumeration.PayoutStatus;
 import org.hibernate.annotations.UuidGenerator;
 
 import java.math.BigDecimal;
@@ -21,7 +21,7 @@ import java.util.UUID;
 public class PayoutTransaction {
 
     @Id
-    @UuidGenerator(style = "UNIX_EPOCH")
+    @UuidGenerator(style = UuidGenerator.Style.TIME)
     @GeneratedValue
     private UUID id;
 

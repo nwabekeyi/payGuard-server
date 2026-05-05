@@ -1,7 +1,7 @@
-package xyz.outlinr.api.repository;
+package com.payguard.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import xyz.outlinr.api.entity.EscrowParticipant;
+import com.payguard.entity.EscrowParticipant;
 
 import java.util.Optional;
 import java.util.UUID;

@@ -1,11 +1,11 @@
-package xyz.outlinr.api.service;
+package com.payguard.service;
 
 import org.springframework.web.multipart.MultipartFile;
-import xyz.outlinr.api.dto.request.CreateDisputeRequest;
-import xyz.outlinr.api.dto.request.ResolveDisputeRequest;
-import xyz.outlinr.api.dto.response.DisputeEvidenceResponse;
-import xyz.outlinr.api.dto.response.DisputeResponse;
-import xyz.outlinr.api.entity.User;
+import com.payguard.dto.request.CreateDisputeRequest;
+import com.payguard.dto.request.ResolveDisputeRequest;
+import com.payguard.dto.response.DisputeEvidenceResponse;
+import com.payguard.dto.response.DisputeResponse;
+import com.payguard.entity.User;
 
 import java.util.List;
 import java.util.UUID;

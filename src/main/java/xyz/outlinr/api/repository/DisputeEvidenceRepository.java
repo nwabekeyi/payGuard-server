@@ -1,8 +1,8 @@
-package xyz.outlinr.api.repository;
+package com.payguard.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-import xyz.outlinr.api.entity.DisputeEvidence;
+import com.payguard.entity.DisputeEvidence;
 
 import java.util.UUID;
 
