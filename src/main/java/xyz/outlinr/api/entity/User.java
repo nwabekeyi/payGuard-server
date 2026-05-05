@@ -75,6 +75,9 @@ public class User implements UserDetails {
     @Column(name = "bank_name")
     private String bankName;
 
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private UserKyc userKyc;
+
     @Column(nullable = false, updatable = false)
     @Builder.Default
     private Instant createdAt = Instant.now();
