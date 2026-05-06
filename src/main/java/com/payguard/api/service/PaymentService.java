@@ -36,5 +36,5 @@ public interface PaymentService {
      */
     VerifyPaymentResponse verifyAndCreateEscrow(VerifyAndCreateEscrowRequest request, User currentUser);
 
-    VerifyPaymentResponse verifyEscrowPayment(UUID escrowId, String transactionReference, long amountInKobo);
+    VerifyPaymentResponse verifyEscrowPayment(String escrowId, String transactionReference, long amountInKobo);
 }

@@ -70,7 +70,7 @@ public class EscrowController {
 
     @GetMapping("/invite/preview")
     public ResponseEntity<InvitePreviewResponse> getInvitePreview(
-            @RequestParam UUID token) {
+            @RequestParam String token) {
         return ResponseEntity.ok(escrowService.getInvitePreview(token));
     }
 

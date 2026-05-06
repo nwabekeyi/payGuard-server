@@ -23,6 +23,7 @@ import com.payguard.api.repository.EscrowRepository;
 import com.payguard.api.repository.FinancialLedgerRepository;
 import com.payguard.api.service.EmailService;
 import com.payguard.api.service.PaymentService;
+import com.payguard.api.utils.EscrowDefaults;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -65,16 +66,23 @@ public class PaystackPaymentServiceImpl implements PaymentService {
             throw new IllegalStateException("Escrow cannot be funded in its current state: " + escrow.getStatus());
         }
 
-        long amountInKobo = escrow.getAmount().multiply(new BigDecimal(100)).longValue();
-        return initiatePaymentCommon(escrowId.toString(), amountInKobo, currentUser);
+        // Calculate total amount including platform fee
+        BigDecimal escrowAmount = escrow.getAmount();
+        BigDecimal platformFee = computePlatformFee(escrowAmount);
+        BigDecimal totalAmount = escrowAmount.add(platformFee);
+        long totalAmountInKobo = totalAmount.multiply(new BigDecimal(100)).longValue();
+        return initiatePaymentCommon(escrowId.toString(), totalAmountInKobo, currentUser);
     }
 
     @Override
     @Transactional
     public InitPaymentResponse initiateNewEscrowPayment(CreateEscrowRequest request, User currentUser) {
-        long amountInKobo = request.amount().multiply(new BigDecimal(100)).longValue();
+        BigDecimal escrowAmount = request.amount();
+        BigDecimal platformFee = computePlatformFee(escrowAmount);
+        BigDecimal totalAmount = escrowAmount.add(platformFee);
+        long totalAmountInKobo = totalAmount.multiply(new BigDecimal(100)).longValue();
         // Use a temporary identifier; we will handle atomic creation via verify-and-create
-        return initiatePaymentCommon("new", amountInKobo, currentUser);
+        return initiatePaymentCommon("new", totalAmountInKobo, currentUser);
     }
 
     private InitPaymentResponse initiatePaymentCommon(String siteId, long amountInKobo, User currentUser) {
@@ -86,8 +94,8 @@ public class PaystackPaymentServiceImpl implements PaymentService {
         payload.put("email", currentUser.getEmail());
         payload.put("currency", "NGN");
         payload.put("callback_url", callbackUrl);
-        // Unique reference
-        String reference = "REF-" + UUID.randomUUID();
+        // Unique reference - use short UUID to avoid length issues
+        String reference = "REF-" + java.util.UUID.randomUUID().toString().substring(0, 12);
         payload.put("reference", reference);
         // Metadata to identify escrow when verifying webhook/callback
         Map<String, String> metadata = Map.of("escrowId", siteId);
@@ -178,9 +186,11 @@ public class PaystackPaymentServiceImpl implements PaymentService {
             escrowRepository.save(escrow);
 
             if (ledgerRepository.findByEscrow(escrow).isEmpty()) {
-                BigDecimal grossAmount = escrow.getAmount();
+                // Gross amount is what the user actually paid (amountInKobo converted to naira)
+                BigDecimal grossAmount = BigDecimal.valueOf(amountInKobo).divide(new BigDecimal(100), 2, RoundingMode.HALF_UP);
                 BigDecimal paystackFee = computePaystackFee(grossAmount);
-                BigDecimal platformFee = computePlatformFee(grossAmount);
+                // Platform fee is based on the escrow base amount (amount escrow is created for)
+                BigDecimal platformFee = computePlatformFee(escrow.getAmount());
                 BigDecimal netPayout = grossAmount.subtract(paystackFee).subtract(platformFee).max(BigDecimal.ZERO);
                 FinancialLedger ledger = FinancialLedger.builder()
                         .escrow(escrow)
@@ -218,7 +228,8 @@ public class PaystackPaymentServiceImpl implements PaymentService {
     }
 
     private BigDecimal computePlatformFee(BigDecimal amount) {
-        BigDecimal pct = amount.multiply(platformFeePercentage).divide(new BigDecimal("100"), 2, RoundingMode.HALF_UP);
+        BigDecimal platformFeePercentageBD = BigDecimal.valueOf(EscrowDefaults.FEE_PERCENT);
+        BigDecimal pct = amount.multiply(platformFeePercentageBD).divide(new BigDecimal("100"), 2, RoundingMode.HALF_UP);
         return pct.add(platformFixedFee).max(BigDecimal.ZERO);
     }
 
@@ -262,12 +273,21 @@ public class PaystackPaymentServiceImpl implements PaymentService {
     }
 
     @Override
-    public VerifyPaymentResponse verifyEscrowPayment(UUID escrowId, String transactionReference, long amountInKobo) {
-        boolean isSuccessful = verifyAndFundEscrow(escrowId, transactionReference, amountInKobo);
-        if (isSuccessful) {
-            return new VerifyPaymentResponse("success", "Payment verified and escrow funded");
+    public VerifyPaymentResponse verifyEscrowPayment(String escrowId, String transactionReference, long amountInKobo) {
+        try {
+            UUID uuid = UUID.fromString(escrowId);
+            boolean isSuccessful = verifyAndFundEscrow(uuid, transactionReference, amountInKobo);
+            if (isSuccessful) {
+                return new VerifyPaymentResponse("success", "Payment verified and escrow funded");
+            }
+            return new VerifyPaymentResponse("failed", "Payment verification failed: transaction status not successful or amount mismatch");
+        } catch (IllegalArgumentException e) {
+            log.warn("Invalid UUID format for escrowId: {}", escrowId);
+            return new VerifyPaymentResponse("failed", "Invalid escrow identifier");
+        } catch (Exception e) {
+            log.error("Payment verification error", e);
+            return new VerifyPaymentResponse("failed", "Payment verification failed: " + e.getMessage());
         }
-        return new VerifyPaymentResponse("failed", "Payment verification failed");
     }
 
     @Override

@@ -22,7 +22,7 @@ public interface EscrowService {
 
     AuthResult acceptInvite(InviteAcceptRequest request);
 
-    InvitePreviewResponse getInvitePreview(UUID inviteToken);
+    InvitePreviewResponse getInvitePreview(String inviteToken);
 
     void deleteEscrow(UUID id, DeleteEscrowRequest request, User currentUser);
 }

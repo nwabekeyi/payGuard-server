@@ -28,7 +28,6 @@ public class CookieService {
         return ResponseCookie.from(ACCESS_TOKEN_COOKIE, token)
                 .httpOnly(true)
                 .secure(secureCookie)
-                .sameSite("Strict")
                 .path("/")
                 .maxAge(accessExpiration / 1000)
                 .build();
@@ -38,17 +37,17 @@ public class CookieService {
         return ResponseCookie.from(REFRESH_TOKEN_COOKIE, token)
                 .httpOnly(true)
                 .secure(secureCookie)
-                .sameSite("Strict")
                 .path("/")
                 .maxAge(refreshExpiration / 1000)
                 .build();
     }
 
+
     public ResponseCookie clearAccessTokenCookie() {
         return ResponseCookie.from(ACCESS_TOKEN_COOKIE, "")
                 .httpOnly(true)
                 .secure(secureCookie)
-                .sameSite("Strict")
+                .sameSite("none")
                 .path("/")
                 .maxAge(0)
                 .build();
@@ -58,7 +57,7 @@ public class CookieService {
         return ResponseCookie.from(REFRESH_TOKEN_COOKIE, "")
                 .httpOnly(true)
                 .secure(secureCookie)
-                .sameSite("Strict")
+                .sameSite("Lax")
                 .path("/")
                 .maxAge(0)
                 .build();

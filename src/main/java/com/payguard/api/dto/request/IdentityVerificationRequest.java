@@ -15,11 +15,10 @@ public class IdentityVerificationRequest {
     @Pattern(regexp = "\\d{11}", message = "Identity number must only contain digits")
     private String kycId;
 
-    @NotBlank(message = "Bank Account Number is required")
+    // Bank fields are optional for users who already have a linked bank account
     @Size(min = 10, max = 10, message = "Account number must be exactly 10 digits")
     @Pattern(regexp = "\\d{10}", message = "Account number must only contain digits")
     private String bankAccountNumber;
 
-    @NotBlank(message = "Bank Code is required")
     private String bankCode;
 }

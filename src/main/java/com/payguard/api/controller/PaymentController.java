@@ -41,7 +41,7 @@ public class PaymentController {
 
     @PostMapping("/verify/{escrowId}")
     public ResponseEntity<VerifyPaymentResponse> verifyPayment(
-            @PathVariable UUID escrowId,
+            @PathVariable String escrowId,
             @Valid @RequestBody VerifyPaymentRequest request) {
         log.info("Verifying payment for escrow {} with txnRef {}", escrowId, request.getTxnRef());
         VerifyPaymentResponse response = paymentService.verifyEscrowPayment(

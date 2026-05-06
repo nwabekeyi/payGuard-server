@@ -8,5 +8,5 @@ import java.util.UUID;
 
 public interface EscrowParticipantRepository extends JpaRepository<EscrowParticipant, UUID> {
 
-    Optional<EscrowParticipant> findByInviteToken(UUID inviteToken);
+    Optional<EscrowParticipant> findByInviteToken(String inviteToken);
 }

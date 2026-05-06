@@ -1,5 +1,7 @@
 package com.payguard.api.utils;
 
+import java.util.List;
+
 public final class EscrowDefaults {
 
     private EscrowDefaults() {
@@ -13,5 +15,6 @@ public final class EscrowDefaults {
     public static final boolean MILESTONE_ENABLED = false;
     public static final double AMOUNT_MIN = 100;
     public static final double AMOUNT_MAX = 20_000_000;
-    public static final double FEE_PERCENT = 1.5;
+    public static final double FEE_PERCENT = 5;
+    public static final List<String> SUPPORTED_CURRENCIES = List.of("NGN", "USD", "GBP", "EUR");
 }

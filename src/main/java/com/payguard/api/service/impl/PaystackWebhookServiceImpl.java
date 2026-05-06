@@ -63,10 +63,15 @@ public class PaystackWebhookServiceImpl implements PaystackWebhookService {
         if ("charge.success".equals(event)) {
             String escrowIdText = root.path("data").path("metadata").path("escrowId").asText();
             if (!escrowIdText.isBlank() && !"new".equalsIgnoreCase(escrowIdText)) {
-                Escrow escrow = escrowRepository.findByIdForUpdate(UUID.fromString(escrowIdText)).orElse(null);
-                if (escrow != null && escrow.getStatus() == EscrowStatus.AWAITING_FUNDING) {
-                    escrow.setStatus(EscrowStatus.FUNDED);
-                    escrowRepository.save(escrow);
+                try {
+                    UUID escrowId = UUID.fromString(escrowIdText);
+                    Escrow escrow = escrowRepository.findByIdForUpdate(escrowId).orElse(null);
+                    if (escrow != null && escrow.getStatus() == EscrowStatus.AWAITING_FUNDING) {
+                        escrow.setStatus(EscrowStatus.FUNDED);
+                        escrowRepository.save(escrow);
+                    }
+                } catch (IllegalArgumentException e) {
+                    log.warn("Invalid escrowId format in webhook metadata: {}", escrowIdText);
                 }
             }
         } else if ("refund.processed".equals(event)) {

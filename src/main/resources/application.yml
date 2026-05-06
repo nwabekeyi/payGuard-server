@@ -21,10 +21,18 @@ spring:
       host: ${REDIS_HOST}
       port: ${REDIS_PORT}
       password: ${REDIS_PASSWORD}
-mail:
-  resend:
-    api-key: ${RESEND_API_KEY}
-    from: admin@app.payguard.ng
+  mail:
+    host: ${EMAIL_HOST}
+    port: ${EMAIL_PORT}
+    username: ${EMAIL_HOST_USER}
+    password: ${EMAIL_HOST_PASSWORD}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: ${EMAIL_USE_TLS:true}
+    from: ${EMAIL_HOST_USER}
 app:
   frontend:
     url: ${FRONTEND_URL}

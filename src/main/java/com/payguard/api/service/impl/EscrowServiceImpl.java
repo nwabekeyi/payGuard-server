@@ -1,6 +1,7 @@
 package com.payguard.api.service.impl;
 
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,11 +19,13 @@ import com.payguard.api.service.EscrowService;
 import com.payguard.api.service.TransferService;
 import com.payguard.api.service.EmailService;
 import com.payguard.api.security.JwtService;
+import com.payguard.api.utils.EscrowDefaults;
 
 import java.time.Instant;
 import java.util.*;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 
 @lombok.extern.slf4j.Slf4j
 @Service
@@ -38,6 +41,17 @@ public class EscrowServiceImpl implements EscrowService {
     private final EmailService emailService; // Changed to use imported EmailService
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
+
+    @Value("${app.fees.platform.percentage:1.50}")
+    private BigDecimal platformFeePercentage;
+    @Value("${app.fees.platform.fixed-ngn:0}")
+    private BigDecimal platformFixedFee;
+    @Value("${app.fees.paystack.percentage:1.50}")
+    private BigDecimal paystackFeePercentage;
+    @Value("${app.fees.paystack.fixed-ngn:100}")
+    private BigDecimal paystackFixedFee;
+    @Value("${app.fees.paystack.cap-ngn:2000}")
+    private BigDecimal paystackFeeCap;
 
     public EscrowServiceImpl(
             EscrowRepository escrowRepository,
@@ -94,10 +108,19 @@ public class EscrowServiceImpl implements EscrowService {
         escrow.getStatusHistory().add(paymentHistory);
         escrowRepository.save(escrow);
 
-        // CREATE LEDGER ENTRY — FUNDS HELD
+        // CREATE LEDGER ENTRY — FUNDS HELD (with platform & paystack fees)
+        // Gross amount is the total paid by the user (amountInKobo converted to naira)
+        BigDecimal grossAmount = BigDecimal.valueOf(amountInKobo).divide(new BigDecimal(100), 2, RoundingMode.HALF_UP);
+        BigDecimal platformFee = computePlatformFee(escrow.getAmount());
+        BigDecimal paystackFee = computePaystackFee(grossAmount);
+        BigDecimal netPayout = grossAmount.subtract(paystackFee).subtract(platformFee).max(BigDecimal.ZERO);
+        
         FinancialLedger ledger = FinancialLedger.builder()
                 .escrow(escrow)
-                .amount(escrow.getAmount())
+                .amount(grossAmount)
+                .paystackFee(paystackFee)
+                .platformFee(platformFee)
+                .netPayoutAmount(netPayout)
                 .currency(escrow.getCurrency())
                 .status(LedgerStatus.HELD)
                 .paymentReference(txnRef)
@@ -425,7 +448,7 @@ public class EscrowServiceImpl implements EscrowService {
 
     @Override
     @Transactional(readOnly = true)
-    public InvitePreviewResponse getInvitePreview(UUID inviteToken) {
+    public InvitePreviewResponse getInvitePreview(String inviteToken) {
         EscrowParticipant participant = participantRepository.findByInviteToken(inviteToken)
                 .orElseThrow(() -> new NoSuchElementException("Invalid invite token"));
 
@@ -620,5 +643,20 @@ public class EscrowServiceImpl implements EscrowService {
                 escrow.getCreatedBy().getName(),
                 escrow.getCreatedBy().getEmail(),
                 participants);
+    }
+
+    private BigDecimal computePaystackFee(BigDecimal amount) {
+        BigDecimal percentageFee = amount.multiply(paystackFeePercentage).divide(new BigDecimal("100"), 2, RoundingMode.HALF_UP);
+        BigDecimal fee = percentageFee.add(paystackFixedFee);
+        if (paystackFeeCap != null && paystackFeeCap.compareTo(BigDecimal.ZERO) > 0 && fee.compareTo(paystackFeeCap) > 0) {
+            fee = paystackFeeCap;
+        }
+        return fee.max(BigDecimal.ZERO);
+    }
+
+    private BigDecimal computePlatformFee(BigDecimal amount) {
+        BigDecimal platformFeePercentageBD = BigDecimal.valueOf(EscrowDefaults.FEE_PERCENT);
+        BigDecimal pct = amount.multiply(platformFeePercentageBD).divide(new BigDecimal("100"), 2, RoundingMode.HALF_UP);
+        return pct.add(platformFixedFee).max(BigDecimal.ZERO);
     }
 }
